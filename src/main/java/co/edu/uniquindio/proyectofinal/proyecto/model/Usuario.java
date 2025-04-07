@@ -9,27 +9,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document("usuarios")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Usuario extends Auditable {
-
+@Document(collection = "usuarios")
+public class Usuario {
     @Id
     private String id;
-
     private String nombre;
-
-    private String correo;
-
+    private String email;
     private String password;
-
-    private EstadoUsuario estado;
-
     private Rol rol;
 
-    private List<String> reportes;
-
+    public Usuario(String nombre, String email, String password, Rol rol) {
+        this.nombre = nombre;
+        this.email = email;
+        this.password = password;
+        this.rol = rol;
+    }
 }
+
+

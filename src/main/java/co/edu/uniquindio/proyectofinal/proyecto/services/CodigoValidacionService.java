@@ -1,8 +1,10 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.validacion.*;
+import co.edu.uniquindio.proyectofinal.proyecto.model.CodigoValidacion;
 
 public interface CodigoValidacionService {
-    void enviarCodigo(String email);
-    boolean verificarCodigo(VerificacionCodigoDTO dto);
+
+    CodigoValidacion guardar(CodigoValidacion codigo);
+
+    CodigoValidacion obtenerPorCodigo(String codigo);
 }

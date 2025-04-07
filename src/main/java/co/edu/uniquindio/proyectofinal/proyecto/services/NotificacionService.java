@@ -1,10 +1,13 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.notificacion.*;
+import co.edu.uniquindio.proyectofinal.proyecto.model.Notificacion;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface NotificacionService {
-    void enviarNotificacion(NotificacionDTO dto);
-    List<NotificacionRespuestaDTO> listarNotificaciones(String idUsuario);
+
+    Notificacion guardar(Notificacion notificacion);
+
+    Optional<Notificacion> obtenerPorUsuario(String idUsuario);
 }

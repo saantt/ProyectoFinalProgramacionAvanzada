@@ -1,10 +1,13 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.comentario.*;
+import co.edu.uniquindio.proyectofinal.proyecto.model.Comentario;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ComentarioService {
-    String crearComentario(ComentarioCreacionDTO dto);
-    List<ComentarioDTO> listarComentariosPorReporte(String idReporte);
+
+    Comentario guardar(Comentario comentario);
+
+    Optional<Comentario> obtenerComentariosPorReporte(String idReporte);
 }

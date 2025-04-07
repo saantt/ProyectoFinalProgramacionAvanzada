@@ -8,7 +8,9 @@ public interface UsuarioService {
     String registrarUsuario(UsuarioRegistroDTO dto);
     String loginUsuario(UsuarioLoginDTO dto);
     UsuarioRespuestaDTO obtenerUsuario(String id);
-    List<UsuarioRespuestaDTO> listarUsuarios();
+    List<UsuarioDTO> listarUsuarios();
     void eliminarUsuario(String id);
     void cambiarEstado(CambioEstadoUsuarioDTO dto);
+    String crearUsuario(UsuarioDTO usuarioDTO);
+
 }
