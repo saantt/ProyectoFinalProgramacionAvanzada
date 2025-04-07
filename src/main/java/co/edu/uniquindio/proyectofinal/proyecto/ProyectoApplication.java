@@ -18,8 +18,10 @@ public class ProyectoApplication  implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
-        Usuario creado = usuarioService.crearUsuario();
-        System.out.println("✅ Usuario guardado en MongoDB: " + creado);
+    public void run(String... args) throws Exception {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'run'");
     }
+
+    
 }
