@@ -1,5 +1,7 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services;
 
-public class UbicacionService {
-    
+import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.UbicacionDTO;
+
+public interface UbicacionService {
+    UbicacionDTO obtenerUbicacionPorReporte(String idReporte);
 }

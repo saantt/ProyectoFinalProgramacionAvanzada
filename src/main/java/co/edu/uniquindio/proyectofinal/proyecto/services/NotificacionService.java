@@ -1,5 +1,10 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services;
 
-public class NotificacionService {
-    
+import co.edu.uniquindio.proyectofinal.proyecto.dto.notificacion.*;
+
+import java.util.List;
+
+public interface NotificacionService {
+    void enviarNotificacion(NotificacionDTO dto);
+    List<NotificacionRespuestaDTO> listarNotificaciones(String idUsuario);
 }

@@ -1,11 +1,14 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services;
 
-import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
-import co.edu.uniquindio.proyectofinal.proyecto.repository.UsuarioRepository;
-import org.springframework.stereotype.Service;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.*;
 
-@Service
-public class UsuarioService {
+import java.util.List;
 
-   
+public interface UsuarioService {
+    String registrarUsuario(UsuarioRegistroDTO dto);
+    String loginUsuario(UsuarioLoginDTO dto);
+    UsuarioRespuestaDTO obtenerUsuario(String id);
+    List<UsuarioRespuestaDTO> listarUsuarios();
+    void eliminarUsuario(String id);
+    void cambiarEstado(CambioEstadoUsuarioDTO dto);
 }
