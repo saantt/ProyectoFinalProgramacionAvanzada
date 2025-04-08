@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.exception;
+/* package co.edu.uniquindio.proyectofinal.proyecto.exception;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -74,3 +74,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 }
+ */

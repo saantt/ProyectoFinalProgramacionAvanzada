@@ -18,6 +18,7 @@ public class Usuario {
     private String nombre;
     private String correo;
     private String password;
+    private String codigoVerificacion;
     private Rol rol;
 
     public Usuario(String nombre, String correo, String password, Rol rol) {

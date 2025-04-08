@@ -1,18 +1,13 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.validacion.CodigoValidacionDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.validacion.VerificacionCodigoDTO;
+public interface ValidacionService {
 
-public class ValidacionService {
-
-    public void enviarCodigo(CodigoValidacionDTO dto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'enviarCodigo'");
-    }
-
-    public boolean verificarCodigo(VerificacionCodigoDTO dto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'verificarCodigo'");
-    }
-
+    /**
+     * Valida si el código enviado por el usuario coincide con el almacenado.
+     *
+     * @param codigo código enviado por el usuario
+     * @param idUsuario id del usuario que intenta validar
+     * @return true si es válido, false si no lo es
+     */
+    boolean validarCodigo(String codigo, String idUsuario);
 }

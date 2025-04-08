@@ -1,34 +1,24 @@
-    package co.edu.uniquindio.proyectofinal.proyecto.controller;
+package co.edu.uniquindio.proyectofinal.proyecto.controller;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.validacion.CodigoValidacionDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.validacion.VerificacionCodigoDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.services.ValidacionService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-
-
-
 @RestController
-@RequestMapping("/api/validaciones")
+@RequestMapping("/api/validacion")
 @RequiredArgsConstructor
-@Tag(name = "Validaciones")
 public class ValidacionController {
 
     private final ValidacionService validacionService;
 
-    @PostMapping("/enviar")
-    public ResponseEntity<Void> enviarCodigo(@RequestBody CodigoValidacionDTO dto) {
-        validacionService.enviarCodigo(dto);
-        return ResponseEntity.ok().build();
-    }
+    @PostMapping("/codigo")
+    public ResponseEntity<Boolean> validarCodigo(
+            @RequestParam String idUsuario,
+            @RequestParam String codigo) {
 
-    @PostMapping("/verificar")
-    public ResponseEntity<Boolean> verificarCodigo(@RequestBody VerificacionCodigoDTO dto) {
-        boolean valido = validacionService.verificarCodigo(dto);
-        return ResponseEntity.ok(valido);
+        boolean esValido = validacionService.validarCodigo(codigo, idUsuario);
+
+        return ResponseEntity.ok(esValido);
     }
 }
