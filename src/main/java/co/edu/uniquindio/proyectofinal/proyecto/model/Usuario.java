@@ -26,6 +26,5 @@ public class Usuario {
         this.password = password;
         this.rol = rol;
     }
+
 }
-
-
