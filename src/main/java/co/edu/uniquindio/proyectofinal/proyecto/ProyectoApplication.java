@@ -18,8 +18,10 @@ public class ProyectoApplication  implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
-        Usuario creado = usuarioService.crearUsuario();
-        System.out.println("✅ Usuario guardado en MongoDB: " + creado);
+    public void run(String... args) throws Exception {
+        // Aquí va el código que quieres ejecutar al iniciar la aplicación
+        System.out.println("La aplicación se ha iniciado correctamente.");
     }
+
+    
 }

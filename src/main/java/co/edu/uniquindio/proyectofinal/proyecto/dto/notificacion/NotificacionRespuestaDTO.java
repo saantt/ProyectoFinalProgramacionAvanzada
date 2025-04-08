@@ -2,16 +2,12 @@ package co.edu.uniquindio.proyectofinal.proyecto.dto.notificacion;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NotificacionDTO {
-    private String id;
+public class NotificacionRespuestaDTO {
     private String mensaje;
-    private String idUsuarioDestino;
-    private LocalDateTime fechaEnvio;
+    private String fechaEnvio;
     private boolean leido;
 }
