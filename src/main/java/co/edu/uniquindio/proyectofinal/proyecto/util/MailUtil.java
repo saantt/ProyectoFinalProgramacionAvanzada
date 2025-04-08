@@ -1,7 +1,7 @@
 package co.edu.uniquindio.proyectofinal.proyecto.util;
 public class MailUtil {
 
-    public static String buildVerificationEmail(String username, String code) {
+    public static String buildVerificationcorreo(String username, String code) {
         return "Hola " + username + ",\n\n"
                 + "Tu código de verificación es: " + code + "\n\n"
                 + "Gracias por usar nuestra plataforma de seguridad ciudadana.";

@@ -16,13 +16,13 @@ public class Usuario {
     @Id
     private String id;
     private String nombre;
-    private String email;
+    private String correo;
     private String password;
     private Rol rol;
 
-    public Usuario(String nombre, String email, String password, Rol rol) {
+    public Usuario(String nombre, String correo, String password, Rol rol) {
         this.nombre = nombre;
-        this.email = email;
+        this.correo = correo;
         this.password = password;
         this.rol = rol;
     }

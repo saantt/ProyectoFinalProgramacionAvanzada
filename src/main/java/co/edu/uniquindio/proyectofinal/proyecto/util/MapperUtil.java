@@ -9,7 +9,7 @@ public class MapperUtil {
         return new UsuarioDTO(
             usuario.getId(),
             usuario.getNombre(),
-            usuario.getEmail(),
+            usuario.getCorreo(),
             usuario.getPassword(),
             usuario.getRol()
         );
@@ -19,7 +19,7 @@ public class MapperUtil {
         Usuario usuario = new Usuario(null, null, null, null);
         usuario.setId(dto.getId());
         usuario.setNombre(dto.getNombre());
-        usuario.setEmail(dto.getEmail());
+        usuario.setCorreo(dto.getCorreo());
         usuario.setPassword(dto.getPassword());
         usuario.setRol(dto.getRol());
         return usuario;

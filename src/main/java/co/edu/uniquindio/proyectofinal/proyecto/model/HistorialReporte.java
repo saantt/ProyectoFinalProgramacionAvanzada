@@ -18,6 +18,7 @@ public class HistorialReporte {
     private String id;
 
     private String idReporte;
+    private String reporteId;
 
     private String estadoAnterior;
 

@@ -23,7 +23,7 @@ public class Reporte extends Auditable {
 
     private EstadoReporteEnum estado;
 
-    private String idUsuario;
+    private String usuarioId;
 
     private Ubicacion ubicacion;
 

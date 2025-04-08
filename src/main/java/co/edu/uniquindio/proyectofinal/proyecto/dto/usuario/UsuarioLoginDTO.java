@@ -7,6 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class UsuarioLoginDTO {
-    private String email;
+    private String correo;
     private String password;
 }

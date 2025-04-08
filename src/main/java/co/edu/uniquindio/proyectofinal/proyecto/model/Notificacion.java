@@ -18,6 +18,6 @@ public class Notificacion extends Auditable {
 
     private String mensaje;
 
-    private String idUsuario;
+    private String usuarioId;
 
 }

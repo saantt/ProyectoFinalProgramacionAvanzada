@@ -18,6 +18,7 @@ public class CodigoValidacion {
     private String id;
 
     private String codigo;
+    private String correo;
 
     private String idUsuario;
 

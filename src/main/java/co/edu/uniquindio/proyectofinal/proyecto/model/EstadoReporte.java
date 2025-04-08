@@ -17,6 +17,7 @@ public class EstadoReporte {
     private String id;
 
     private String idReporte;
+    private String reporteId;
 
     private EstadoReporteEnum estado;
 

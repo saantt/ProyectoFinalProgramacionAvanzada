@@ -19,8 +19,8 @@ public class ProyectoApplication  implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'run'");
+        // Aquí va el código que quieres ejecutar al iniciar la aplicación
+        System.out.println("La aplicación se ha iniciado correctamente.");
     }
 
     

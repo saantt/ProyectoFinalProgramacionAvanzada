@@ -17,6 +17,7 @@ public class Comentario extends Auditable {
     private String id;
 
     private String contenido;
+    private String reporteId;
 
     private String idUsuario;
 

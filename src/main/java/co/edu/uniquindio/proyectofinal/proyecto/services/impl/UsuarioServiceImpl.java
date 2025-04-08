@@ -25,7 +25,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public String crearUsuario(UsuarioDTO usuarioDTO) {
         Usuario usuario = new Usuario(
             usuarioDTO.getNombre(),
-            usuarioDTO.getEmail(),
+            usuarioDTO.getCorreo(),
             usuarioDTO.getPassword(),
             usuarioDTO.getRol()
         );
@@ -39,7 +39,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             .map(u -> new UsuarioDTO(
                 u.getId(),
                 u.getNombre(),
-                u.getEmail(),
+                u.getCorreo(),
                 u.getPassword(),
                 u.getRol()
             ))
