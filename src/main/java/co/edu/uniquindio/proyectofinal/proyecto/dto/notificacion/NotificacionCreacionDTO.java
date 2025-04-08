@@ -1,16 +1,13 @@
 package co.edu.uniquindio.proyectofinal.proyecto.dto.notificacion;
 
-import lombok.*;
-
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class NotificacionDTO {
-    private String id;
+public class NotificacionCreacionDTO {
     private String mensaje;
     private String idUsuario;
-    private LocalDateTime fecha;
 }

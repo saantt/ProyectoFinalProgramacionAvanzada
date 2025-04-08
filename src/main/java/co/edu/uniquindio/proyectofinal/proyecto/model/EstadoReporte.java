@@ -18,9 +18,11 @@ public class EstadoReporte {
 
     private String idReporte;
     private String reporteId;
-
+    private String nombre;
     private EstadoReporteEnum estado;
 
     private String observacion;
+
+  
 
 }

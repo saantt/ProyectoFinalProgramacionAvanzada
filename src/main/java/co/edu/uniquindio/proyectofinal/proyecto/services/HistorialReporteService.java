@@ -1,12 +1,12 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services;
 
-import co.edu.uniquindio.proyectofinal.proyecto.model.HistorialReporte;
-
 import java.util.List;
 
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.HistorialReporteCreacionDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.HistorialReporteDTO;
+
 public interface HistorialReporteService {
+    void crearHistorial(HistorialReporteCreacionDTO dto);
 
-    HistorialReporte guardar(HistorialReporte historial);
-
-    List<HistorialReporte> obtenerPorIdReporte(String idReporte);
+    List<HistorialReporteDTO> listarHistorialesPorReporte(String idReporte);
 }

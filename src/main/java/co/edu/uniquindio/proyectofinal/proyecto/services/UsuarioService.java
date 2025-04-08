@@ -5,12 +5,14 @@ import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.*;
 import java.util.List;
 
 public interface UsuarioService {
-    String registrarUsuario(UsuarioRegistroDTO dto);
-    String loginUsuario(UsuarioLoginDTO dto);
-    UsuarioRespuestaDTO obtenerUsuario(String id);
-    List<UsuarioDTO> listarUsuarios();
-    void eliminarUsuario(String id);
-    void cambiarEstado(CambioEstadoUsuarioDTO dto);
-    String crearUsuario(UsuarioDTO usuarioDTO);
 
+    String crearUsuario(UsuarioDTO usuarioDTO) throws Exception;
+
+    UsuarioDTO obtenerUsuario(String id) throws Exception;
+
+    String actualizarUsuario(String id, UsuarioDTO usuarioDTO) throws Exception;
+
+    String eliminarUsuario(String id) throws Exception;
+
+    List<UsuarioDTO> listarUsuarios();
 }

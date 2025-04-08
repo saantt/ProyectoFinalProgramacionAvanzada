@@ -1,47 +1,70 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.CambioEstadoReporteDTO;
+import org.springframework.stereotype.Service;
+
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteCreacionDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteRespuestaDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Reporte;
+import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoReporteEnum;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.ReporteRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.services.ReporteService;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ReporteServiceImpl implements ReporteService {
 
-    @Autowired
-    private ReporteRepository reporteRepository;
+    private final ReporteRepository reporteRepository;
+
+    public ReporteServiceImpl(ReporteRepository reporteRepository) {
+        this.reporteRepository = reporteRepository;
+    }
 
     @Override
     public String crearReporte(ReporteCreacionDTO dto) {
         Reporte reporte = new Reporte();
+        reporte.setId(UUID.randomUUID().toString());
         reporte.setTitulo(dto.getTitulo());
         reporte.setDescripcion(dto.getDescripcion());
-        // otros campos...
-        return reporteRepository.save(reporte).getId();
+        reporte.setIdUsuario(dto.getIdUsuario());
+        reporte.setIdCategoria(dto.getIdCategoria());
+        reporte.setUbicacion(dto.getUbicacion());
+        reporte.setEstado(EstadoReporteEnum.ENVIADO);
+        reporte.setFechaCreacion(LocalDateTime.now());
+
+        reporteRepository.save(reporte);
+        return reporte.getId();
     }
 
     @Override
-    public ReporteRespuestaDTO obtenerReporte(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerReporte'");
+    public List<ReporteDTO> listarReportes() {
+        return reporteRepository.findAll().stream().map(r ->
+                new ReporteDTO(
+                        r.getId(), r.getTitulo(), r.getDescripcion(),
+                        r.getIdUsuario(), r.getIdCategoria(), r.getUbicacion(),
+                        r.getEstado(), r.getFechaCreacion()
+                )
+        ).collect(Collectors.toList());
     }
 
     @Override
-    public List<ReporteRespuestaDTO> listarReportes() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'listarReportes'");
+    public ReporteDTO obtenerReporte(String id) {
+        Reporte r = reporteRepository.findById(id).orElseThrow(() -> new RuntimeException("Reporte no encontrado"));
+        return new ReporteDTO(
+                r.getId(), r.getTitulo(), r.getDescripcion(),
+                r.getIdUsuario(), r.getIdCategoria(), r.getUbicacion(),
+                r.getEstado(), r.getFechaCreacion()
+        );
     }
 
     @Override
-    public void cambiarEstado(CambioEstadoReporteDTO dto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'cambiarEstado'");
+    public void eliminarReporte(String id) {
+        if (!reporteRepository.existsById(id)) {
+            throw new RuntimeException("No existe el reporte con ID " + id);
+        }
+        reporteRepository.deleteById(id);
     }
 }
