@@ -41,13 +41,10 @@ public class ReporteServiceImpl implements ReporteService {
 
     @Override
     public List<ReporteDTO> listarReportes() {
-        return reporteRepository.findAll().stream().map(r ->
-                new ReporteDTO(
-                        r.getId(), r.getTitulo(), r.getDescripcion(),
-                        r.getIdUsuario(), r.getIdCategoria(), r.getUbicacion(),
-                        r.getEstado(), r.getFechaCreacion()
-                )
-        ).collect(Collectors.toList());
+        return reporteRepository.findAll().stream().map(r -> new ReporteDTO(
+                r.getId(), r.getTitulo(), r.getDescripcion(),
+                r.getIdUsuario(), r.getIdCategoria(), r.getUbicacion(),
+                r.getEstado(), r.getFechaCreacion())).collect(Collectors.toList());
     }
 
     @Override
@@ -56,8 +53,7 @@ public class ReporteServiceImpl implements ReporteService {
         return new ReporteDTO(
                 r.getId(), r.getTitulo(), r.getDescripcion(),
                 r.getIdUsuario(), r.getIdCategoria(), r.getUbicacion(),
-                r.getEstado(), r.getFechaCreacion()
-        );
+                r.getEstado(), r.getFechaCreacion());
     }
 
     @Override
