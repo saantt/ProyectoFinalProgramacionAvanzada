@@ -1,5 +1,5 @@
 package co.edu.uniquindio.proyectofinal.proyecto.dto.auth;
 
-public class TokenDTO {
-    
+public record TokenDTO(
+        String token) {
 }

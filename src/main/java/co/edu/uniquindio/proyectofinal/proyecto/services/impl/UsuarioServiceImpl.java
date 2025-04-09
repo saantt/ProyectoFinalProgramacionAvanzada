@@ -8,6 +8,8 @@ import co.edu.uniquindio.proyectofinal.proyecto.repository.UsuarioRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.services.UsuarioService;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,13 +20,14 @@ import java.util.stream.Collectors;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public String crearUsuario(UsuarioDTO usuarioDTO) {
         Usuario usuario = new Usuario();
         usuario.setNombre(usuarioDTO.getNombre());
         usuario.setCorreo(usuarioDTO.getCorreo());
-        usuario.setPassword(usuarioDTO.getPassword());
+        usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
         usuario.setRol(usuarioDTO.getRol());
 
         usuarioRepository.save(usuario);
@@ -41,8 +44,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario.getNombre(),
                 usuario.getCorreo(),
                 usuario.getPassword(),
-                usuario.getRol()
-        );
+                usuario.getRol());
     }
 
     @Override
@@ -52,7 +54,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         usuario.setNombre(usuarioDTO.getNombre());
         usuario.setCorreo(usuarioDTO.getCorreo());
-        usuario.setPassword(usuarioDTO.getPassword());
+        usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
 
         usuarioRepository.save(usuario);
         return "Usuario actualizado correctamente";
@@ -77,9 +79,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         usuario.getPassword(),
                         usuario.getRol()
 
-                )
-        ).collect(Collectors.toList());
+                )).collect(Collectors.toList());
     }
 
-   
 }
