@@ -1,82 +1,84 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.CambioEstadoUsuarioDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.UsuarioDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.UsuarioLoginDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.UsuarioRegistroDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.UsuarioRespuestaDTO;
+
+import co.edu.uniquindio.proyectofinal.proyecto.exception.ResourceNotFoundException;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.UsuarioRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.services.UsuarioService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Override
     public String crearUsuario(UsuarioDTO usuarioDTO) {
-        Usuario usuario = new Usuario(
-            usuarioDTO.getNombre(),
-            usuarioDTO.getCorreo(),
-            usuarioDTO.getPassword(),
-            usuarioDTO.getRol()
-        );
+        Usuario usuario = new Usuario();
+        usuario.setNombre(usuarioDTO.getNombre());
+        usuario.setCorreo(usuarioDTO.getCorreo());
+        usuario.setPassword(usuarioDTO.getPassword());
+        usuario.setRol(usuarioDTO.getRol());
 
-        return usuarioRepository.save(usuario).getId();
+        usuarioRepository.save(usuario);
+        return "Usuario creado correctamente";
+    }
+
+    @Override
+    public UsuarioDTO obtenerUsuario(String id) throws Exception {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        return new UsuarioDTO(
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getCorreo(),
+                usuario.getPassword(),
+                usuario.getRol()
+        );
+    }
+
+    @Override
+    public String actualizarUsuario(String id, UsuarioDTO usuarioDTO) throws Exception {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        usuario.setNombre(usuarioDTO.getNombre());
+        usuario.setCorreo(usuarioDTO.getCorreo());
+        usuario.setPassword(usuarioDTO.getPassword());
+
+        usuarioRepository.save(usuario);
+        return "Usuario actualizado correctamente";
+    }
+
+    @Override
+    public String eliminarUsuario(String id) throws Exception {
+        if (!usuarioRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+        usuarioRepository.deleteById(id);
+        return "Usuario eliminado correctamente";
     }
 
     @Override
     public List<UsuarioDTO> listarUsuarios() {
-        return usuarioRepository.findAll().stream()
-            .map(u -> new UsuarioDTO(
-                u.getId(),
-                u.getNombre(),
-                u.getCorreo(),
-                u.getPassword(),
-                u.getRol()
-            ))
-            .collect(Collectors.toList());
-    }
+        return usuarioRepository.findAll().stream().map(
+                usuario -> new UsuarioDTO(
+                        usuario.getId(),
+                        usuario.getNombre(),
+                        usuario.getCorreo(),
+                        usuario.getPassword(),
+                        usuario.getRol()
 
-    @Override
-    public void cambiarEstado(CambioEstadoUsuarioDTO cambioEstadoUsuarioDTO) {
-        // Aquí puedes implementar la lógica de cambio de estado si tu modelo Usuario tiene un campo "estado"
-        // Por ejemplo:
-        // Usuario usuario = usuarioRepository.findById(cambioEstadoUsuarioDTO.getId()).orElseThrow(...);
-        // usuario.setEstado(cambioEstadoUsuarioDTO.getNuevoEstado());
-        // usuarioRepository.save(usuario);
-    }
-
-    @Override
-    public String registrarUsuario(UsuarioRegistroDTO dto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'registrarUsuario'");
-    }
-
-    @Override
-    public String loginUsuario(UsuarioLoginDTO dto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loginUsuario'");
-    }
-
-    @Override
-    public UsuarioRespuestaDTO obtenerUsuario(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerUsuario'");
-    }
-
-    @Override
-    public void eliminarUsuario(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eliminarUsuario'");
+                )
+        ).collect(Collectors.toList());
     }
 
    

@@ -1,5 +1,6 @@
 package co.edu.uniquindio.proyectofinal.proyecto.model;
 
+import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.UbicacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.model.common.Auditable;
 import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoReporteEnum;
 import lombok.*;
@@ -23,10 +24,17 @@ public class Reporte extends Auditable {
 
     private EstadoReporteEnum estado;
 
-    private String usuarioId;
+    private String IdUsuario;
 
     private Ubicacion ubicacion;
 
     private String idCategoria;
+
+    public void setUbicacion(UbicacionDTO ubicacion2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setUbicacion'");
+    }
+
+    
 
 }

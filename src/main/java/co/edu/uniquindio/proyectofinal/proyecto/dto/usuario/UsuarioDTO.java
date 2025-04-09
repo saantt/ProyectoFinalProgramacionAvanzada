@@ -1,5 +1,6 @@
 package co.edu.uniquindio.proyectofinal.proyecto.dto.usuario;
 
+import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
 import co.edu.uniquindio.proyectofinal.proyecto.model.enums.Rol;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,3 +18,5 @@ public class UsuarioDTO {
     private String password;
     private Rol rol;
 }
+
+
