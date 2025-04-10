@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteCreacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.services.ReporteService;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class ReporteController {
     }
 
     @PostMapping
-    public ResponseEntity<String> crearReporte(@RequestBody ReporteCreacionDTO dto) {
+    public ResponseEntity<String> crearReporte(@RequestBody @Valid ReporteCreacionDTO dto) {
         return ResponseEntity.ok(reporteService.crearReporte(dto));
     }
 

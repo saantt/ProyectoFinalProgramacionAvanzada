@@ -17,7 +17,8 @@ import java.util.Date;
 @Component
 public class JWTUtils {
 
-    public String generateToken(String id, Rol rol) {
+    public String generateToken(String id, Map<String, String> claims) {
+        Rol rol = Rol.valueOf(claims.get("rol"));   
 
         Instant now = Instant.now();
 
@@ -41,5 +42,8 @@ public class JWTUtils {
         byte[] secretKeyBytes = claveSecreta.getBytes();
         return Keys.hmacShaKeyFor(secretKeyBytes);
     }
+
+   
+    
 
 }
