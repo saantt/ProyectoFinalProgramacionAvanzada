@@ -3,6 +3,9 @@ package co.edu.uniquindio.proyectofinal.proyecto.util;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
+
+import co.edu.uniquindio.proyectofinal.proyecto.model.enums.Rol;
+
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -14,12 +17,12 @@ import java.util.Date;
 @Component
 public class JWTUtils {
 
-    public String generateToken(String id, Map<String, String> claims) {
+    public String generateToken(String id, Rol rol) {
 
         Instant now = Instant.now();
 
         return Jwts.builder()
-                .claims(claims)
+                .claim("authorities", "ROLE_" + rol.name()) // ¡Formato clave!
                 .subject(id)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(1L, ChronoUnit.HOURS)))
