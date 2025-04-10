@@ -18,5 +18,3 @@ public class UsuarioDTO {
     private String password;
     private Rol rol;
 }
-
-

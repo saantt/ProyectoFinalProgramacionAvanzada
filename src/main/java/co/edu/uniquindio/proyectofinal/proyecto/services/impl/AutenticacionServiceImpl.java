@@ -1,42 +1,63 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
+import java.util.Map;
+import java.util.Optional;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import co.edu.uniquindio.proyectofinal.proyecto.dto.auth.LoginRequestDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.auth.LoginResponseDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.auth.TokenDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.UsuarioLoginDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.UsuarioRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.services.AutenticacionService;
 import co.edu.uniquindio.proyectofinal.proyecto.services.EmailService;
-import co.edu.uniquindio.proyectofinal.proyecto.util.JwtUtil;
+import co.edu.uniquindio.proyectofinal.proyecto.util.JWTUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 
 @Service
 public class AutenticacionServiceImpl implements AutenticacionService {
 
+    private final PasswordEncoder passwordEncoder;
+
     private final UsuarioRepository usuarioRepository;
-    private final JwtUtil jwtUtil;
+    private final JWTUtils jwtUtils;
     private final EmailService emailService;
 
-    public AutenticacionServiceImpl(UsuarioRepository usuarioRepository, JwtUtil jwtUtil, EmailService emailService) {
+    public AutenticacionServiceImpl(UsuarioRepository usuarioRepository, JWTUtils jwtUtils, EmailService emailService,
+            PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
-        this.jwtUtil = jwtUtil;
+        this.jwtUtils = jwtUtils;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public LoginResponseDTO login(LoginRequestDTO dto) throws Exception {
-        Usuario usuario = usuarioRepository.findByCorreo(dto.getCorreo())
-                .orElseThrow(() -> new Exception("Usuario no encontrado"));
+    public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) throws Exception {
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByCorreo(loginRequestDTO.getCorreo());
 
-        if (!new BCryptPasswordEncoder().matches(dto.getPassword(), usuario.getPassword())) {
+        if (optionalUsuario.isEmpty()) {
+            throw new Exception("El usuario no existe");
+        }
+
+        Usuario usuario = optionalUsuario.get();
+
+        if (!passwordEncoder.matches(loginRequestDTO.getPassword(), usuario.getPassword())) {
             throw new Exception("Contraseña incorrecta");
         }
 
-        String token = jwtUtil.generateToken(usuario.getCorreo());
-        emailService.enviarCorreo(usuario.getCorreo(), "Tu token de autenticación", "Token: " + token);
-
-        return new LoginResponseDTO(token);
+        String token = jwtUtils.generateToken(usuario.getId().toString(), crearClaims(usuario));
+        return new LoginResponseDTO(token); // Usa LoginResponseDTO en lugar de LoginRequestDTO
     }
+
+    private Map<String, String> crearClaims(Usuario usuario) {
+        return Map.of(
+                "email", usuario.getCorreo(),
+                "nombre", usuario.getNombre(),
+                "rol", "ROLE_" + usuario.getRol().name());
+    }
+
 }

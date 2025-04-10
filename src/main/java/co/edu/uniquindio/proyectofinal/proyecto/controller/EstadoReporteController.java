@@ -1,4 +1,4 @@
-    package co.edu.uniquindio.proyectofinal.proyecto.controller;
+package co.edu.uniquindio.proyectofinal.proyecto.controller;
 
 import co.edu.uniquindio.proyectofinal.proyecto.services.EstadoReporteService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -7,9 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-
-
 
 @RestController
 @RequestMapping("/api/estados-reporte")
