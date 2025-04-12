@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,22 +31,34 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint JwtautenticacionEntryPoint;
     private final DetalleUsuarioService userDetailsService;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
-                        .requestMatchers("/api/cliente/**").hasRole("CIUDADANO")
-                        .anyRequest().permitAll())
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(JwtautenticacionEntryPoint))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+   @Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(
+                "/api/auth/**",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/swagger-ui.html",
+                "/webjars/**",
+                "/v3/api-docs",
+                "/swagger-config",
+                "/favicon.ico",
+                "/error"
+            ).permitAll()
+            .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
+            .requestMatchers("/api/cliente/**").hasRole("CIUDADANO")
+            .anyRequest().permitAll()
+        )
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(JwtautenticacionEntryPoint))
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+}
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -58,15 +71,18 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*")); // Cambiar por dominios específicos en producción
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowedOrigins(List.of("*"));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+    config.setExposedHeaders(List.of("Authorization"));
+    config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+}
+
+
 }

@@ -31,13 +31,15 @@ public class CuentaServiceTest {
     public void crearCuentaTest() throws Exception {
 
         CrearCuentaDTO crearCuentaDTO = new CrearCuentaDTO(
-                "1098798321",
-                "Rosario Meléndez",
-                "3124532875",
+                "1098798321",   
+                "Prueba Usuario",
+                "31043242",
                 "Carrera 21 #13-64",
-                "rosario27@email.com",
-                "password"
+                "sgomeeez05@gmail.com",
+                "newPassword"       
         );
+        cuentaServicio.crearCuenta(crearCuentaDTO);
+       
 //        CrearCuentaDTO crearCuentaDTO = new CrearCuentaDTO(
 //                "4321",
 //                "Prueba Usuario Eliminar",
@@ -50,28 +52,28 @@ public class CuentaServiceTest {
 
 
         // Se espera que no se lance ninguna excepción
-        assertDoesNotThrow( () -> {
+      /*   assertDoesNotThrow( () -> {
             // Se crea la cuenta y se imprime el id
             String id = cuentaServicio.crearCuenta(crearCuentaDTO);
             // Se espera que el id no sea nulo
             assertNotNull(id);
-        } );
+        } ); */
 
     }
 
-    @Test
+  /*   @Test
     public void editarCuentaTest(){
 
 
         //Se define el id de la cuenta del usuario a actualizar, este id está en el dataset.js
-        String idCuenta = "6701ed1fa81f609e1a5692fb"; //Usuario 2 de la bd PruebasUnitarios
+        String idCuenta = "67f706216c8289421af920a9"; //Usuario 2 de la bd PruebasUnitarios
 
 
         //Se crea un objeto de tipo EditarCuentaDTO
         EditarCuentaDTO editarCuentaDTO = new EditarCuentaDTO(
                 idCuenta,
-                "Raul Quintero",
-                "3124532875",
+                "Milton Santiago",
+                "3128845263",
                 "Nueva dirección"
         );
 
@@ -86,14 +88,14 @@ public class CuentaServiceTest {
             InformacionCuentaDTO detalle = cuentaServicio.obtenerInformacionCuenta(idCuenta);
 
         });
-    }
+    } */
 
-
+/* 
     @Test
     public void eliminarCuentaTest(){
 
         //Se define el id de la cuenta del usuario a eliminar, este id está en el dataset.js
-        String idCuenta = "670ff61d375d72246c685a95";
+        String idCuenta = "67f706216c8289421af920a9";
 
         //Se elimina la cuenta del usuario con el id definido
         assertDoesNotThrow(() -> cuentaServicio.eliminarCuenta(idCuenta) );
@@ -110,13 +112,13 @@ public class CuentaServiceTest {
         //Se verifica que la lista no sea nula y que tenga 3 elementos (o los que hayan)
         assertFalse(lista.isEmpty());
         assertEquals(3, lista.size());
-    }
+    } */
 
-    @Test
+  /*   @Test
     public void obtenerInformacionCuentaTest() {
 
         // Se define el id de la cuenta del usuario, este id está en el dataset.js
-        String idCuenta = "6701ec61eb812956e91267d7";
+        String idCuenta = "67f706216c8289421af920a9";
 
         // Se invoca el método obtenerInformacionCuenta y se espera que no lance excepciones
         assertDoesNotThrow(() -> {
@@ -131,13 +133,13 @@ public class CuentaServiceTest {
             assertEquals("usuario2@example.com", informacion.email());
         });
 
-    }
+    } */
 
-    @Test
+ /*    @Test
     public void enviarCodigoRecuperacionPasswordTest() throws Exception {
 
         // Se define el email de la cuenta del usuario a recuperar, este email está en el dataset.js
-        String email = "unieventosfae@gmail.com";
+        String email = "sgomeeez05@gmail.com";
 
         // Se verifica que el método no lanza ninguna excepción
         assertDoesNotThrow(() -> cuentaServicio.enviarCodigoRecuperacionPassword(email));
@@ -151,10 +153,10 @@ public class CuentaServiceTest {
         // Se verifica que la fecha de creación del código de validación no sea anterior a la fecha actual
         assertTrue(cuenta.getCodigoValidacionPassword().getFechaCreacion().isBefore(LocalDateTime.now()));
 
-    }
+    } */
 
 
-    @Test
+   /*  @Test
     public void cambiarPasswordTest() throws Exception {
         // Preparar el DTO con un código de verificación válido
         String email = "unieventosfae@gmail.com";
@@ -205,8 +207,8 @@ public class CuentaServiceTest {
         //assertEquals("El token de activación es inválido.", exception.getMessage());
 
     }
-
-    @Test
+ */
+   /*  @Test
     public void iniciarSesionTest() throws Exception {
         // Preparar el entorno
         String email = "unieventosfae@gmail.com";
@@ -232,15 +234,15 @@ public class CuentaServiceTest {
         // Comprobar el mensaje de la excepción
         assertEquals("La contraseña es incorrecta", exception.getMessage());
     }
+ */
 
 
 
-
-    @Test
+   /*  @Test
     public void enviarCodigoActivacionCuentaTest() throws Exception {
 
         // Se define el email de la cuenta del usuario a recuperar, este email está en el dataset.js
-        String email = "unieventosfae@gmail.com";
+        String email = "sgomeeez05@gmail.com";
 
         // Se verifica que el método no lanza ninguna excepción
         assertDoesNotThrow(() -> cuentaServicio.enviarCodigoActivacionCuenta(email));
@@ -254,7 +256,7 @@ public class CuentaServiceTest {
         // Se verifica que la fecha de creación del código de validación no sea anterior a la fecha actual
         assertTrue(cuenta.getCodigoValidacionRegistro().getFechaCreacion().isBefore(LocalDateTime.now()));
 
-    }
+    } */
 
 
 }

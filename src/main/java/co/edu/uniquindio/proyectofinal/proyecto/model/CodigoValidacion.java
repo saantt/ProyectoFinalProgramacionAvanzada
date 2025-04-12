@@ -15,6 +15,7 @@ public class CodigoValidacion {
 
     private LocalDateTime fechaCreacion;
     private String codigo;
+    private String email;
 
 
 }

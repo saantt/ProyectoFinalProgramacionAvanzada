@@ -79,7 +79,7 @@ public class CuentaServiceImpl implements CuentaServicio {
         nuevaCuenta.setEstado(EstadoUsuario.INACTIVO);
         nuevaCuenta.setCodigoValidacionRegistro(
                 new CodigoValidacion(
-                        LocalDateTime.now(), codigoAleatorio
+                        LocalDateTime.now(), codigoAleatorio, codigoAleatorio
                 ));
         nuevaCuenta.setReportes(new ArrayList<>());
         
@@ -153,7 +153,7 @@ public class CuentaServiceImpl implements CuentaServicio {
 
         cuenta.setCodigoValidacionPassword(new CodigoValidacion(
                 LocalDateTime.now(),
-                codigoValidacion
+                codigoValidacion, codigoValidacion
                 ));
 
         cuentaRepo.save(cuenta);
@@ -386,7 +386,7 @@ public class CuentaServiceImpl implements CuentaServicio {
 
         cuenta.setCodigoValidacionRegistro(new CodigoValidacion(
                 LocalDateTime.now(),
-                codigoValidacion
+                codigoValidacion, codigoValidacion
         ));
 
         cuentaRepo.save(cuenta);
