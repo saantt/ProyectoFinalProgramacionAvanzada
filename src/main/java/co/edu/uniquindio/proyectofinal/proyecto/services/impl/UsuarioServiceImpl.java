@@ -26,7 +26,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public String crearUsuario(UsuarioDTO usuarioDTO) {
         Usuario usuario = new Usuario();
         usuario.setNombre(usuarioDTO.getNombre());
-        usuario.setCorreo(usuarioDTO.getCorreo());
+        usuario.setEmail(usuarioDTO.getEmail());
         usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
         usuario.setRol(usuarioDTO.getRol());
 
@@ -42,7 +42,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         return new UsuarioDTO(
                 usuario.getId(),
                 usuario.getNombre(),
-                usuario.getCorreo(),
+                usuario.getEmail(),
                 usuario.getPassword(),
                 usuario.getRol());
     }
@@ -53,7 +53,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         usuario.setNombre(usuarioDTO.getNombre());
-        usuario.setCorreo(usuarioDTO.getCorreo());
+        usuario.setEmail(usuarioDTO.getEmail());
         usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
 
         usuarioRepository.save(usuario);
@@ -75,7 +75,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario -> new UsuarioDTO(
                         usuario.getId(),
                         usuario.getNombre(),
-                        usuario.getCorreo(),
+                        usuario.getEmail(),
                         usuario.getPassword(),
                         usuario.getRol()
 

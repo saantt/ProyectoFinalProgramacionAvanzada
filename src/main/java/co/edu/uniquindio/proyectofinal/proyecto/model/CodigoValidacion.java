@@ -1,27 +1,20 @@
 package co.edu.uniquindio.proyectofinal.proyecto.model;
 
-import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Document("codigos_validacion")
-@Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 public class CodigoValidacion {
 
-    @Id
-    private String id;
-
+    private LocalDateTime fechaCreacion;
     private String codigo;
-    private String correo;
 
-    private String idUsuario;
-
-    private LocalDateTime fechaExpiracion;
 
 }

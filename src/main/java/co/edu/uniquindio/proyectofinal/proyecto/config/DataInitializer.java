@@ -23,7 +23,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (!usuarioRepository.existsByCorreo("milton@mail.com")) {
+        if (!usuarioRepository.existsByemail("milton@mail.com")) {
             Usuario usuario = new Usuario(
                     "Milton",
                     "milton@mail.com",

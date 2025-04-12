@@ -8,6 +8,6 @@ import lombok.*;
 @Builder
 public class UsuarioRegistroDTO {
     private String nombre;
-    private String correo;
+    private String email;
     private String password;
 }

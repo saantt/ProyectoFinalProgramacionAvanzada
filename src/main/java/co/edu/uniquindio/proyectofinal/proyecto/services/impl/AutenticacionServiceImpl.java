@@ -37,7 +37,7 @@ public class AutenticacionServiceImpl implements AutenticacionService {
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) throws Exception {
-        Optional<Usuario> optionalUsuario = usuarioRepository.findByCorreo(loginRequestDTO.getCorreo());
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByemail(loginRequestDTO.getEmail());
 
         if (optionalUsuario.isEmpty()) {
             throw new Exception("El usuario no existe");
@@ -49,13 +49,13 @@ public class AutenticacionServiceImpl implements AutenticacionService {
             throw new Exception("Contraseña incorrecta");
         }
 
-        String token = jwtUtils.generateToken(usuario.getId().toString(), crearClaims(usuario));
+        String token = jwtUtils.generarToken(usuario.getId().toString(), crearClaims(usuario));
         return new LoginResponseDTO(token); // Usa LoginResponseDTO en lugar de LoginRequestDTO
     }
 
-    private Map<String, String> crearClaims(Usuario usuario) {
+    private Map<String, Object> crearClaims(Usuario usuario) {
         return Map.of(
-                "email", usuario.getCorreo(),
+                "email", usuario.getEmail(),
                 "nombre", usuario.getNombre(),
                 "rol", "ROLE_" + usuario.getRol().name());
     }
