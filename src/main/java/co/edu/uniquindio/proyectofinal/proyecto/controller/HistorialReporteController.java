@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.controller;
+/* package co.edu.uniquindio.proyectofinal.proyecto.controller;
 
 
 import lombok.RequiredArgsConstructor;
@@ -29,3 +29,4 @@ public class HistorialReporteController {
         return ResponseEntity.ok(historialReporteService.listarHistorialesPorReporte(idReporte));
     }
 }
+ */

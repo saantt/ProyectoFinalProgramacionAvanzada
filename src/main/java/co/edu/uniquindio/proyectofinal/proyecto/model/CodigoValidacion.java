@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 @Setter
 public class CodigoValidacion {
 
+    public CodigoValidacion(String codigoActivacion, LocalDateTime now) {
+        //TODO Auto-generated constructor stub
+    }
     private LocalDateTime fechaCreacion;
     private String codigo;
     private String email;

@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class AutenticacionControlador {
 
 
-    private final CuentaServicio cuentaServicio;
+   /*  private final CuentaServicio cuentaServicio;
 
     @PostMapping("/iniciar-sesion")
     public ResponseEntity<MensajeDTO<TokenDTO>> iniciarSesion(@Valid @RequestBody LoginDTO loginDTO) throws Exception{
@@ -32,7 +32,7 @@ public class AutenticacionControlador {
     public ResponseEntity<MensajeDTO<String>> crearCuenta(@Valid @RequestBody CrearCuentaDTO cuenta) throws Exception{
         cuentaServicio.crearCuenta(cuenta);
         return ResponseEntity.ok(new MensajeDTO<>(false, "Cuenta creada exitosamente"));
-    }
+    } */
 
 
 }

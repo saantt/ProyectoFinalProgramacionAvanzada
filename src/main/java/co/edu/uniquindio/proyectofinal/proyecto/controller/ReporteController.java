@@ -5,40 +5,75 @@ package co.edu.uniquindio.proyectofinal.proyecto.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import co.edu.uniquindio.proyectofinal.proyecto.dto.MensajeDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.estado.CambiarEstadoDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.EditarReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteCreacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.services.ReporteService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/reportes")
 public class ReporteController {
 
-    private final ReporteService reporteService;
+    private final ReporteService reporteServicio;
 
-    public ReporteController(ReporteService reporteService) {
-        this.reporteService = reporteService;
-    }
-
+    // Crear un nuevo reporte
     @PostMapping
-    public ResponseEntity<String> crearReporte(@RequestBody ReporteCreacionDTO dto) {
-        return ResponseEntity.ok(reporteService.crearReporte(dto));
+    public ResponseEntity<MensajeDTO<String>> crear(@Valid @RequestBody ReporteCreacionDTO reporte) throws Exception {
+        reporteServicio.crearReporte(reporte);
+        return ResponseEntity.ok(new MensajeDTO<>(false, "Reporte creado exitosamente"));
     }
 
-    @GetMapping
-    public ResponseEntity<List<ReporteDTO>> listarReportes() {
-        return ResponseEntity.ok(reporteService.listarReportes());
+    // Editar un reporte existente
+    @PutMapping("/{id}")
+    public ResponseEntity<MensajeDTO<String>> editar(@PathVariable String id, @Valid @RequestBody EditarReporteDTO dto) throws Exception {
+        reporteServicio.actualizarReporte(id, dto);
+        return ResponseEntity.ok(new MensajeDTO<>(false, "Reporte editado correctamente"));
     }
+    
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ReporteDTO> obtenerReporte(@PathVariable String id) {
-        return ResponseEntity.ok(reporteService.obtenerReporte(id));
-    }
-
+    // Eliminar un reporte
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarReporte(@PathVariable String id) {
-        reporteService.eliminarReporte(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> eliminar(@PathVariable String id) throws Exception {
+        reporteServicio.eliminarReporte(id);
+        return ResponseEntity.ok("Reporte eliminado correctamente");
+    }
+
+    // Obtener un reporte específico
+    @GetMapping("/{id}")
+    public ResponseEntity<ReporteDTO> obtener(@PathVariable String id) throws Exception {
+        ReporteDTO reporte = reporteServicio.obtener(id);
+        return ResponseEntity.ok(reporte);
+    }
+
+//    // Listar reportes con filtros opcionales
+//    @GetMapping
+//    public ResponseEntity<List<ReporteDTO>> listar(
+//            @RequestParam(required = false) String titulo,
+//            @RequestParam(required = false) String categoria,
+//            @RequestParam(required = false) String estado,
+//            @RequestParam(defaultValue = "0") int pagina
+//    ) {
+//        List<ReporteDTO> reportes = reporteServicio.listar(titulo, categoria, estado, pagina);
+//        return ResponseEntity.ok(reportes);
+//    }
+
+    // Marcar un reporte como importante
+    @PutMapping("/{id}/importante")
+    public ResponseEntity<String> marcarImportante(@PathVariable String id) throws Exception {
+        reporteServicio.marcarImportante(id);
+        return ResponseEntity.ok("Reporte marcado como importante");
+    }
+
+    // Cambiar el estado de un reporte
+    @PutMapping("/{id}/estado/{nuevoEstado}")
+    public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable CambiarEstadoDTO cambiarEstadoDTO) throws Exception {
+        reporteServicio.cambiarEstadoReporte(id, cambiarEstadoDTO);
+        return ResponseEntity.ok("Estado del reporte actualizado a: " + cambiarEstadoDTO);
     }
 }

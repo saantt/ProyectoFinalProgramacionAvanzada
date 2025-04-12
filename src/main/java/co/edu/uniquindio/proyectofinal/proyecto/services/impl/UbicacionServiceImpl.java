@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
+/* package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
 import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.UbicacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Ubicacion;
@@ -33,3 +33,4 @@ public class UbicacionServiceImpl implements UbicacionService {
         throw new UnsupportedOperationException("Unimplemented method 'obtenerUbicacionPorReporte'");
     }
 }
+ */

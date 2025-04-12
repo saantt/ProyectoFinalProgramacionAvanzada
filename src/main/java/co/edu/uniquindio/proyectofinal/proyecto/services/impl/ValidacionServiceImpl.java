@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
+/* package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
 import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.UsuarioRepository;
@@ -39,3 +39,4 @@ public class ValidacionServiceImpl implements ValidacionService {
         return false;
     }
 }
+ */

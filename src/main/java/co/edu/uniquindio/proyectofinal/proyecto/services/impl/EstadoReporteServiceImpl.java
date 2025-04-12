@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
+/* package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
 
 import co.edu.uniquindio.proyectofinal.proyecto.services.EstadoReporteService;
@@ -40,3 +40,4 @@ public class EstadoReporteServiceImpl implements EstadoReporteService {
 
     
 }
+ */

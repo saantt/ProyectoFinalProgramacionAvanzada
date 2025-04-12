@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
+/* package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.HistorialReporteCreacionDTO;    
 
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.HistorialReporteDTO;
@@ -41,3 +41,4 @@ public class HistorialReporteServiceImpl implements HistorialReporteService {
                 .collect(Collectors.toList());
     }
 }
+ */

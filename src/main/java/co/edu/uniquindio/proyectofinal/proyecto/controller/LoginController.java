@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.controller;
+/* package co.edu.uniquindio.proyectofinal.proyecto.controller;
 
 import co.edu.uniquindio.proyectofinal.proyecto.dto.*;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.auth.LoginRequestDTO;
@@ -28,3 +28,4 @@ public class LoginController {
         }
     }
 }
+ */

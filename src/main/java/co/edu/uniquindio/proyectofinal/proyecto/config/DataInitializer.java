@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.config;
+/* package co.edu.uniquindio.proyectofinal.proyecto.config;
 
 import co.edu.uniquindio.proyectofinal.proyecto.model.Categoria;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
@@ -46,3 +46,4 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 }
+ */

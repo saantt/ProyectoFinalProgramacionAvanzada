@@ -1,17 +1,17 @@
 package co.edu.uniquindio.proyectofinal.proyecto.dto.comentario;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ComentarioDTO {
-    private String id;
-    private String contenido;
-    private String idUsuario;
-    private String idReporte;
-    private LocalDateTime fechaComentario;
-}
+
+public record ComentarioDTO(
+         String id,
+         String mensaje,
+         LocalDateTime fecha,
+         String clienteId,
+         String nombreCliente,
+         String reporteId
+){}

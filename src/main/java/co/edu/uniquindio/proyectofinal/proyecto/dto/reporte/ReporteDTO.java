@@ -1,28 +1,26 @@
 
 package co.edu.uniquindio.proyectofinal.proyecto.dto.reporte;
 
-import co.edu.uniquindio.proyectofinal.proyecto.model.Ubicacion;
-import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoReporteEnum;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.UbicacionDTO;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ReporteDTO {
-    public ReporteDTO(String id2, String titulo2, String descripcion2, String idUsuario2, String idCategoria2,
-            Ubicacion ubicacion2, EstadoReporteEnum estado2, LocalDateTime fechaCreacion2) {
-        //TODO Auto-generated constructor stub
-    }
-    private String id;
-    private String titulo;
-    private String descripcion;
-    private String idUsuario;
-    private String idCategoria;
-    private UbicacionDTO ubicacion;
-    private EstadoReporteEnum estado;
-    private LocalDateTime fechaCreacion;
-}
+import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.UbicacionDTO;
+
+public record ReporteDTO (
+        String id,
+        String titulo,
+        String descripcion,
+        String estado,
+        LocalDateTime fecha,
+        boolean importante,
+        String clienteId,
+        String nombreCliente,
+        UbicacionDTO ubicacion,
+        String categoriaId,
+        String nombreCategoria,
+        List<String> fotos
+){}

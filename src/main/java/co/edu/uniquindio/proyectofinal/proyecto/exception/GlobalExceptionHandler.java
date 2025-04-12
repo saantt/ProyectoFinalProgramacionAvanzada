@@ -1,77 +1,54 @@
-/* package co.edu.uniquindio.proyectofinal.proyecto.exception;
+package co.edu.uniquindio.proyectofinal.proyecto.exception;
 
-import org.apache.coyote.BadRequestException;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.MensajeDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.validacion.ValidacionDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import io.micrometer.core.instrument.config.validate.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Maneja errores de validación
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
-        Map<String, Object> response = new HashMap<>();
-        Map<String, String> errors = new HashMap<>();
 
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-            errors.put(error.getField(), error.getDefaultMessage())
-        );
-
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Validation Failed");
-        response.put("details", errors);
-
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<MensajeDTO<String>> noResourceFoundExceptionHandler (NoResourceFoundException ex){
+        return ResponseEntity.status(404).body( new MensajeDTO<>(true, "El recurso no fue encontrado") );
     }
 
-    // Maneja recurso no encontrado
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
-        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
-    }
 
-    // Maneja solicitud mal formada
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<Map<String, Object>> handleBadRequest(BadRequestException ex) {
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
-    // Maneja acceso no autorizado
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedException ex) {
-        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
-    }
-
-    // Maneja errores de validación de negocio (manuales)
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(ValidationException ex) {
-        return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
-    }
-
-    // Maneja cualquier otro error no esperado
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error: " + ex.getMessage());
+    public ResponseEntity<MensajeDTO<String>> generalExceptionHandler (Exception e){
+        return ResponseEntity.internalServerError().body( new MensajeDTO<>(true, e.getMessage()) );
     }
 
-    // Método utilitario para generar respuestas
-    private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String message) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", status.value());
-        response.put("error", status.getReasonPhrase());
-        response.put("message", message);
-        return new ResponseEntity<>(response, status);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<MensajeDTO<List<ValidacionDTO>>> validationExceptionHandler ( MethodArgumentNotValidException ex ) {
+        List<ValidacionDTO> errores = new ArrayList<>();
+        BindingResult results = ex.getBindingResult();
+
+
+        for (FieldError e: results.getFieldErrors()) {
+            errores.add( new ValidacionDTO(e.getField(), e.getDefaultMessage()) );
+        }
+
+
+        return ResponseEntity.badRequest().body( new MensajeDTO<>(true, errores) );
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> manejarRecursoNoEncontrado(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+
 }
- */

@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.controller;
+/* package co.edu.uniquindio.proyectofinal.proyecto.controller;
 
 import co.edu.uniquindio.proyectofinal.proyecto.services.EstadoReporteService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,3 +21,4 @@ public class EstadoReporteController {
         return ResponseEntity.ok(estadoReporteService.obtenerEstados());
     }
 }
+ */

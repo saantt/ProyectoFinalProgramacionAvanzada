@@ -2,10 +2,17 @@ package co.edu.uniquindio.proyectofinal.proyecto.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public record LoginDTO(
-        @NotBlank @Email String email,
-        @NotBlank String password
-) {
-}
+
+public record LoginDTO (
+                @NotBlank(message = "El email es obligatorio")
+                @Email(message = "El formato del email no es válido")
+                String email,
+
+                @NotBlank(message = "La contraseña es obligatoria")
+                String password
+){}
 

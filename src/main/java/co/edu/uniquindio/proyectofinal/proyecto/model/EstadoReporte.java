@@ -13,6 +13,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 public class EstadoReporte {
 
+    public static final EstadoReporte ELIMINADO = null;
+
+    public static final EstadoReporte PENDIENTE = null;
+
     @Id
     private String id;
 

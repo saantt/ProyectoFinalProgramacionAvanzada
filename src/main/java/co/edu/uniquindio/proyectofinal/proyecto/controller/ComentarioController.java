@@ -14,19 +14,27 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/comentarios")
 @RequiredArgsConstructor
-@Tag(name = "Comentarios")
 public class ComentarioController {
 
-    private final ComentarioService comentarioService;
+    private final ComentarioService comentarioServicio;
 
-    @PostMapping
-    public ResponseEntity<Void> crearComentario(@RequestBody ComentarioCreacionDTO dto) {
-        comentarioService.crearComentario(dto);
-        return ResponseEntity.ok().build();
+    @PostMapping("/{idReporte}")
+    public void crearComentario(@PathVariable String idReporte, @RequestBody ComentarioCreacionDTO comentarioDTO) throws Exception {
+        comentarioServicio.crearComentario(idReporte, comentarioDTO);
     }
 
-    @GetMapping("/reporte/{idReporte}")
-    public ResponseEntity<Object> listarComentariosPorReporte(@PathVariable String idReporte) {
-        return ResponseEntity.ok(comentarioService.listarComentariosPorReporte(idReporte));
+    @PutMapping("/{idReporte}/{idComentario}")
+    public ResponseEntity<String> editarComentario(
+            @PathVariable String idReporte,
+            @PathVariable String idComentario,
+            @RequestParam String nuevoMensaje
+    ) throws Exception {
+        comentarioServicio.editarComentario(idReporte, idComentario, nuevoMensaje);
+        return ResponseEntity.ok("Comentario actualizado correctamente");
+    }
+
+    @GetMapping("/{idReporte}")
+    public List<ComentarioDTO> obtenerComentarios(@PathVariable String idReporte) throws Exception {
+        return comentarioServicio.obtenerComentarios(idReporte);
     }
 }

@@ -1,5 +1,6 @@
 package co.edu.uniquindio.proyectofinal.proyecto.dto.comentario;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Data
@@ -7,7 +8,13 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class ComentarioCreacionDTO {
-    private String contenido;
-    private String idUsuario;
-    private String idReporte;
+    @NotBlank(message = "El mensaje es obligatorio")
+    String mensaje;
+
+    @NotBlank(message = "El ID del cliente es obligatorio")
+    String clienteId;
+
+
+{
+}
 }

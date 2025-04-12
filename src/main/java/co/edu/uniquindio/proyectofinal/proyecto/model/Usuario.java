@@ -1,43 +1,48 @@
 package co.edu.uniquindio.proyectofinal.proyecto.model;
 
-import co.edu.uniquindio.proyectofinal.proyecto.model.common.Auditable;
-import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoUsuario;
-import co.edu.uniquindio.proyectofinal.proyecto.model.enums.Rol;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.*;
 
-import org.hibernate.validator.constraints.Length;
+import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
+import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoUsuario;
+import co.edu.uniquindio.proyectofinal.proyecto.model.enums.Rol;
 
+@Document("usuarios")
 @Getter
 @Setter
-@Document(collection = "usuarios")
+@NoArgsConstructor
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Usuario {
+
     @Id
-    private String id;
+    @EqualsAndHashCode.Include
+    private ObjectId id;
+
     private String nombre;
     private String email;
-    private String password;
-    private String codigoVerificacion;
+    private String telefono;
+    private String ciudad;
     private Rol rol;
+    private EstadoUsuario estado; 
+    private String password;
+    private CodigoValidacion codigoValidacion; 
+    private String fechaRegistro;
 
-    public Usuario(String nombre, String email, String password, Rol rol) {
+
+    
+    @Builder
+    public Usuario(String nombre, String email, String telefono, String ciudad, Rol rol, EstadoUsuario estado, String password, CodigoValidacion codigoValidacion, String fechaRegistro) {
         this.nombre = nombre;
         this.email = email;
-        this.password = password;
+        this.telefono = telefono;
+        this.ciudad = ciudad;
         this.rol = rol;
-    }
-
-    public Usuario() {
-    }
-
-    public Usuario(String cedula, String nombre2,
-            String telefono, String direccion,
-            String email2, String password2) {
-        //TODO Auto-generated constructor stub
+        this.estado = estado;
+        this.password = password;
+        this.codigoValidacion = codigoValidacion;
+        this.fechaRegistro = fechaRegistro;
     }
 }

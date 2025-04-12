@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
+/* package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
 import co.edu.uniquindio.proyectofinal.proyecto.model.CodigoValidacion;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.CodigoValidacionRepository;
@@ -22,3 +22,4 @@ public class CodigoValidacionServiceImpl implements CodigoValidacionService {
         return codigoValidacionRepository.findById(codigo).orElse(null);
     }
 }
+ */

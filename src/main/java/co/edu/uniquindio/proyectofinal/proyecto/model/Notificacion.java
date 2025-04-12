@@ -1,9 +1,14 @@
 package co.edu.uniquindio.proyectofinal.proyecto.model;
 
-import co.edu.uniquindio.proyectofinal.proyecto.model.common.Auditable;
+import co.edu.uniquindio.proyectofinal.proyecto.model.enums.TipoNotificacion;
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+
+
+import java.time.LocalDateTime;
 
 @Document("notificaciones")
 @Getter
@@ -11,13 +16,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Notificacion extends Auditable {
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class Notificacion {
 
     @Id
-    private String id;
+    @EqualsAndHashCode.Include
+    private ObjectId id;
 
     private String mensaje;
-
-    private String idUsuario;
-
+    private LocalDateTime fecha;
+    private TipoNotificacion tipoNotificacion;
+    private boolean leida;
+    private ObjectId reporteId;
+    private ObjectId usuarioId;
 }

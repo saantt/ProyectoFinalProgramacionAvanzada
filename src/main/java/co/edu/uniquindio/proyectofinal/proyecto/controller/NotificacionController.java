@@ -1,4 +1,4 @@
-    package co.edu.uniquindio.proyectofinal.proyecto.controller;
+/*     package co.edu.uniquindio.proyectofinal.proyecto.controller;
 
 
 import co.edu.uniquindio.proyectofinal.proyecto.services.NotificacionService;
@@ -27,3 +27,4 @@ public class NotificacionController {
         return ResponseEntity.ok(notificacionService.obtenerNotificaciones(idUsuario));
     }
 }
+ */

@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
+/* /* /* package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -318,7 +318,7 @@ public class CuentaServiceImpl implements CuentaServicio {
                 .filter(reporte -> tituloReporte.equals(reporte.getTitulo()))
                 .collect(Collectors.toList());
     } */
-    @Override
+   /*  @Override
     public List<Cuenta> buscarReportesPorTitulo(String tituloReporte) {
         return cuentaRepo.buscarReportesPorTitulo(tituloReporte);
     }
@@ -528,11 +528,7 @@ public class CuentaServiceImpl implements CuentaServicio {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'obtenerDetalleBoleta'");
     }
-
+ */
    
 
-
-
-
-}
 

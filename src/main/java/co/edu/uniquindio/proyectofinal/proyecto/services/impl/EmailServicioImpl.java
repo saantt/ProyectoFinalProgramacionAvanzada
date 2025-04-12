@@ -1,92 +1,51 @@
-package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
-import jakarta.mail.MessagingException;
-import jakarta.validation.constraints.Email;
-
-import org.springframework.mail.javamail.*;
+package co.edu.uniquindio.proyectofinal.proyecto.services.impl;  
+import org.simplejavamail.api.email.Email;
+import org.simplejavamail.api.mailer.Mailer;
+import org.simplejavamail.email.EmailBuilder;
+import org.simplejavamail.mailer.internal.MailerImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-
-import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.EmailDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.email.EmailDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.services.EmailService;
-
-import java.io.ByteArrayOutputStream;
-import com.google.zxing.WriterException;
-
-import org.simplejavamail.api.mailer.Mailer;
-import org.simplejavamail.api.mailer.config.TransportStrategy;
-import org.simplejavamail.email.EmailBuilder;
-import org.simplejavamail.mailer.MailerBuilder;
-import org.springframework.mail.SimpleMailMessage;
-
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
-public class EmailServicioImpl implements EmailService{
+@RequiredArgsConstructor
+public class EmailServicioImpl implements EmailService {
+
+    private final Mailer mailer;
+
+    
 
     @Override
-    @Async
-    public void enviaremail(EmailDTO emailDTO) throws Exception {
-
-
-        Email email = (Email) EmailBuilder.startingBlank()
-                .from("santiagomaring05@gmail.com")
-                .to(emailDTO.destinatario())
-                .withSubject(emailDTO.asunto())
-                .withPlainText(emailDTO.cuerpo())
-
-                .buildEmail();
-
-
-        //unieventosfae@gmail.com
-        //fae12345
-        //clave de aplicación: yygy ngcd lulw oxjk
-        try (Mailer mailer = MailerBuilder
-                .withSMTPServer("smtp.gmail.com", 587, "santiagomaring05@gmail.com", "santinew890")
-                .withTransportStrategy(TransportStrategy.SMTP_TLS)
-                .withDebugLogging(true)
-                .buildMailer()) {
-
-            mailer.sendMail((org.simplejavamail.api.email.Email) email);
-        }
-
-
+    @Async("taskExecutor")
+    public void enviarCorreo(co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.EmailDTO emailDTO)
+            throws Exception {
+                if (emailDTO.destinatario() == null || emailDTO.destinatario().isBlank()) {
+                    throw new IllegalArgumentException("El destinatario del correo no puede ser nulo.");
+                }
+        
+                String fromEmail = ((MailerImpl) mailer).getServerConfig().getUsername();
+        
+                Email email = EmailBuilder.startingBlank()
+                        .from(fromEmail)
+                        .to(emailDTO.destinatario())
+                        .withSubject(emailDTO.asunto())
+                        .withHTMLText(emailDTO.cuerpo())
+                        .buildEmail();
+        
+                log.info("Enviando correo a {}", emailDTO.destinatario());
+        
+                mailer.sendMail(email);
     }
-
-    @Override
-    @Async
-    public void enviaremailHtml(EmailDTO emailDTO) throws Exception {
-
-
-        Email email = (Email) EmailBuilder.startingBlank()
-                .from("santiagomaring05@gmail.com")
-                .to(emailDTO.destinatario())
-                .withSubject(emailDTO.asunto())
-                .appendTextHTML(emailDTO.cuerpo())
-
-                .buildEmail();
-
-
-        //unieventosfae@gmail.com
-        //fae12345
-        //clave de aplicación: yygy ngcd lulw oxjk
-        try (Mailer mailer = MailerBuilder
-                .withSMTPServer("smtp.gmail.com", 587, "santiagomaring05@gmail.com", "santinew890")
-                .withTransportStrategy(TransportStrategy.SMTP_TLS)
-                .withDebugLogging(true)
-                .buildMailer()) {
-
-            mailer.sendMail((org.simplejavamail.api.email.Email) email);
-        }
-
-
-    }
-
-   
-   
+}
 
     
    
 
 
-}
+
 

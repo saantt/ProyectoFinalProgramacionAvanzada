@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.repository;
+/* package co.edu.uniquindio.proyectofinal.proyecto.repository;
 
 import co.edu.uniquindio.proyectofinal.proyecto.model.HistorialReporte;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -10,3 +10,4 @@ public interface HistorialReporteRepository extends MongoRepository<HistorialRep
     List<HistorialReporte> findByIdReporte(String idReporte);
 
 }
+ */

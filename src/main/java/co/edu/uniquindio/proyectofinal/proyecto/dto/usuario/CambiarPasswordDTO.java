@@ -1,9 +1,12 @@
 package co.edu.uniquindio.proyectofinal.proyecto.dto.usuario;
 
-public record CambiarPasswordDTO(
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Length;
 
-        String email,
-        String codigoVerificacion,
-        String passwordNueva
+public record CambiarPasswordDTO(
+        @NotBlank String codigoValidacion,
+        @NotBlank @Email String email,
+        @NotBlank @Length(min = 6) String nuevaPassword
 ) {
 }

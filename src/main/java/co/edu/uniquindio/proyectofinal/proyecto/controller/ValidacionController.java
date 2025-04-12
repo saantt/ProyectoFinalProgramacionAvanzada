@@ -1,4 +1,4 @@
-package co.edu.uniquindio.proyectofinal.proyecto.controller;
+/* package co.edu.uniquindio.proyectofinal.proyecto.controller;
 
 import co.edu.uniquindio.proyectofinal.proyecto.services.ValidacionService;
 import lombok.RequiredArgsConstructor;
@@ -22,3 +22,4 @@ public class ValidacionController {
         return ResponseEntity.ok(esValido);
     }
 }
+ */

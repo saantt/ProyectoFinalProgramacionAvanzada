@@ -19,7 +19,8 @@ import java.util.Optional;
 } */
 
 public interface ComentarioService {
-    void crearComentario(ComentarioCreacionDTO dto);
-    List<ComentarioDTO> listarComentariosPorReporte(String idReporte);
+    List<ComentarioDTO> obtenerComentarios(String idReporte) throws Exception;
+    void crearComentario(String idReporte, ComentarioCreacionDTO comentarioDTO) throws Exception;
+    void editarComentario(String idReporte, String idComentario, String nuevoMensaje) throws Exception;
 }
 

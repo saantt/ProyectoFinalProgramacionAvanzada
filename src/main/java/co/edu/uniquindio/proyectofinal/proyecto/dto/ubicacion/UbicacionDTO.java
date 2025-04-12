@@ -1,14 +1,14 @@
 package co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion;
 
-import lombok.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class UbicacionDTO {
-    private double latitud;
-    private double longitud;
-    private String direccion;
-    private String ciudad;
-}
+public record UbicacionDTO (
+            @NotNull(message = "La latitud es obligatoria")
+            Double latitud,
+
+            @NotNull(message = "La longitud es obligatoria")
+            Double longitud
+){}

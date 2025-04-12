@@ -1,31 +1,23 @@
 package co.edu.uniquindio.proyectofinal.proyecto.model;
 
+
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+
+
 import java.time.LocalDateTime;
 
-@Document("historial_reportes")
+@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class HistorialReporte {
 
-    @Id
-    private String id;
-
-    private String idReporte;
-    private String reporteId;
-
-    private String estadoAnterior;
-
-    private String estadoNuevo;
-
-    private LocalDateTime fechaCambio;
-
+    private EstadoReporte estado;
     private String observacion;
-
+    private LocalDateTime fecha;
+    private ObjectId clienteId;
 }
