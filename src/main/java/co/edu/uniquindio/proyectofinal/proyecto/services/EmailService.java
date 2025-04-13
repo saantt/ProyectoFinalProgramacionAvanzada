@@ -1,10 +1,7 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.EmailDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.email.EmailDTO;
 
 public interface EmailService {
-
-    public void enviarCorreo(EmailDTO emailDTO) throws Exception;
-    
-
+    void enviarCorreo(EmailDTO emailDTO) throws Exception;
 }

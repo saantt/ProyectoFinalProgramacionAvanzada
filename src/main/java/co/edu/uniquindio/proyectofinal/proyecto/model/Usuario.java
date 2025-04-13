@@ -1,10 +1,10 @@
 package co.edu.uniquindio.proyectofinal.proyecto.model;
 
-
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoUsuario;
 import co.edu.uniquindio.proyectofinal.proyecto.model.enums.Rol;
@@ -23,18 +23,20 @@ public class Usuario {
 
     private String nombre;
     private String email;
-    private String telefono;
     private String ciudad;
     private Rol rol;
-    private EstadoUsuario estado; 
+    private EstadoUsuario estado;
+
+    @Field("password")
     private String password;
-    private CodigoValidacion codigoValidacion; 
+
+    private String telefono;
+    private CodigoValidacion codigoValidacion;
     private String fechaRegistro;
 
-
-    
     @Builder
-    public Usuario(String nombre, String email, String telefono, String ciudad, Rol rol, EstadoUsuario estado, String password, CodigoValidacion codigoValidacion, String fechaRegistro) {
+    public Usuario(String nombre, String email, String telefono, String ciudad, Rol rol, EstadoUsuario estado,
+            String password, CodigoValidacion codigoValidacion, String fechaRegistro) {
         this.nombre = nombre;
         this.email = email;
         this.telefono = telefono;
@@ -44,5 +46,14 @@ public class Usuario {
         this.password = password;
         this.codigoValidacion = codigoValidacion;
         this.fechaRegistro = fechaRegistro;
+    }
+
+    // Getters necesarios
+    public ObjectId getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

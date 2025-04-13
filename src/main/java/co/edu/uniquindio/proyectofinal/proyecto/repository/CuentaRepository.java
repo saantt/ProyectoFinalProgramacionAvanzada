@@ -1,5 +1,4 @@
-/* package co.edu.uniquindio.proyectofinal.proyecto.repository;
-
+package co.edu.uniquindio.proyectofinal.proyecto.repository;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -33,5 +32,4 @@ public interface CuentaRepository extends MongoRepository<Cuenta, String> {
     @Query("{ 'reportes.titulo' : ?0 }")
     List<Cuenta> buscarReportesPorTitulo(String tituloReporte);
 
-
-} */
+}

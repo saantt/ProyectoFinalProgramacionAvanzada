@@ -2,6 +2,8 @@ package co.edu.uniquindio.proyectofinal.proyecto.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import co.edu.uniquindio.proyectofinal.proyecto.model.enums.Rol;
@@ -18,30 +20,28 @@ import java.util.Date;
 
 public class JWTUtils {
 
-    public String generarToken(String email, Map<String, Object> claims) throws Exception {
-
+    public String generarToken(String email, Map<String, Object> claims) { // Cambia a String
         Instant now = Instant.now();
-
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(email)
+                .subject(email) // Usamos directamente el email
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(1L, ChronoUnit.HOURS)))
-                .signWith( getKey() )
+                .signWith(getKey())
                 .compact();
     }
 
-    public Jws<Claims> parseJwt(String jwtString) throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, IllegalArgumentException {
-        JwtParser jwtParser = Jwts.parser().verifyWith( getKey() ).build();
+    public Jws<Claims> parseJwt(String jwtString)
+            throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, IllegalArgumentException {
+        JwtParser jwtParser = Jwts.parser().verifyWith(getKey()).build();
         return jwtParser.parseSignedClaims(jwtString);
     }
 
-    private SecretKey getKey(){
+    private SecretKey getKey() {
         String claveSecreta = "secretsecretsecretsecretsecretsecretsecretsecret";
         byte[] secretKeyBytes = claveSecreta.getBytes();
         return Keys.hmacShaKeyFor(secretKeyBytes);
     }
-
 
 }

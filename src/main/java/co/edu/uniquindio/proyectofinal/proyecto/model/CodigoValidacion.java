@@ -12,13 +12,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CodigoValidacion {
-
-    public CodigoValidacion(String codigoActivacion, LocalDateTime now) {
-        //TODO Auto-generated constructor stub
-    }
-    private LocalDateTime fechaCreacion;
     private String codigo;
+    private LocalDateTime fechaCreacion;
     private String email;
 
-
+    public CodigoValidacion(String codigo, LocalDateTime fechaCreacion) {
+        this.codigo = codigo;
+        this.fechaCreacion = fechaCreacion;
+    }
 }

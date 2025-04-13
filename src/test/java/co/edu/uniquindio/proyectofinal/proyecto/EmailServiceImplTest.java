@@ -6,17 +6,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.simplejavamail.api.email.Email;
 import org.simplejavamail.api.mailer.Mailer;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.EmailDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.email.EmailDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.services.impl.EmailServicioImpl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EmailServicioImplTest {
@@ -29,40 +28,41 @@ class EmailServicioImplTest {
 
     @BeforeEach
     void setUp() {
-        // Inyectamos manualmente el valor de smtpUsername para evitar NullPointer
-        ReflectionTestUtils.setField(emailServicio, "smtpUsername", "prueba@correo.com");
+        // Configuración para pruebas
+        emailServicio = new EmailServicioImpl(mailer);
+        emailServicio.setSmtpUsername("prueba@correo.com");
+        emailServicio.setSmtpName("Nombre Remitente");
     }
 
     @Test
     void enviarCorreo_DeberiaEnviarCorreoCorrectamente() throws Exception {
-        // Arrange
         EmailDTO emailDTO = new EmailDTO(
-                "destinatario@correo.com",
                 "Asunto de prueba",
-                "<p>Cuerpo del correo de prueba</p>"
-        );
+                "<p>Cuerpo del correo de prueba</p>",
+                "destinatario@correo.com");
 
-        // Act
         emailServicio.enviarCorreo(emailDTO);
 
-        // Assert
-        Mockito.verify(mailer, Mockito.times(1)).sendMail(Mockito.any(Email.class));
+        verify(mailer, times(1)).sendMail(any(Email.class));
     }
 
     @Test
     void enviarCorreo_DeberiaConstruirCorreoCorrectamente() throws Exception {
-        // Arrange
         EmailDTO emailDTO = new EmailDTO(
-                "destinatario@correo.com",
                 "Asunto de prueba",
-                "<p>Cuerpo del correo de prueba</p>"
-        );
+                "<p>Cuerpo del correo de prueba</p>",
+                "destinatario@correo.com");
 
-        // Act
+        ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
+
         emailServicio.enviarCorreo(emailDTO);
 
-        // Assert
-        // Verificamos que el método de envío haya sido llamado correctamente
-        Mockito.verify(mailer).sendMail(Mockito.any(Email.class));
-        }
+        verify(mailer).sendMail(emailCaptor.capture());
+        Email emailEnviado = emailCaptor.getValue();
+
+        assertEquals("Asunto de prueba", emailEnviado.getSubject());
+        assertEquals("destinatario@correo.com", emailEnviado.getRecipients().get(0).getAddress());
+        assertEquals("prueba@correo.com", emailEnviado.getFromRecipient().getAddress());
+        assertTrue(emailEnviado.getHTMLText().contains("Cuerpo del correo de prueba"));
+    }
 }

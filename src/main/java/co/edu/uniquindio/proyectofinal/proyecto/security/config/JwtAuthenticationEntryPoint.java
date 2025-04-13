@@ -16,13 +16,17 @@ import java.io.IOException;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest request,
-            HttpServletResponse response,
-            AuthenticationException authException)
-            throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException authException) throws IOException {
 
-        // Devuelve 401 Unauthorized
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No autorizado: Token inválido o inexistente");
+        MensajeDTO<String> dto = new MensajeDTO<>(true, "No tienes permisos para acceder a este recurso");
+
+        response.setContentType("application/json");
+        response.setStatus(403);
+        response.getWriter().write(new ObjectMapper().writeValueAsString(dto));
+        response.getWriter().flush();
+        response.getWriter().close();
+
     }
 
 }

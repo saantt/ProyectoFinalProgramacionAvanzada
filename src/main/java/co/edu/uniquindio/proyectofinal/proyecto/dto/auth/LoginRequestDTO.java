@@ -1,5 +1,6 @@
 package co.edu.uniquindio.proyectofinal.proyecto.dto.auth;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter

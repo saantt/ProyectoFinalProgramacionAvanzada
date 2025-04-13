@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,78 +27,55 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JWTUtils jwtUtils;
+    private final JWTUtils jwtUtil;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/api/login") || path.startsWith("/swagger-ui");
+        return path.startsWith("/api/auth") ||
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs");
     }
 
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+            FilterChain chain) throws ServletException, IOException {
 
-        // Configuración de cabeceras para CORS
-        response.addHeader("Access-Control-Allow-Origin", "*");
-        response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.addHeader("Access-Control-Allow-Headers", "Origin, Accept, Content-Type, Authorization");
+        String token = getToken(request);
 
-        if (request.getMethod().equals("OPTIONS")) {
-            response.setStatus(HttpServletResponse.SC_OK);
-        } else {
-            try {
-                String token = getToken(request);
-
-                if (token != null) {
-                    Jws<Claims> jws = jwtUtils.parseJwt(token);
-                    Claims claims = jws.getPayload();
-
-                    // 1. Extraer el rol del token (debe estar como "ROLE_ROL")
-                    String rolStr = claims.get("rol", String.class);
-                    Rol rol = Rol.valueOf(rolStr.replace("ROLE_", ""));
-
-                    // 2. Crear autenticación para Spring Security
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            claims.getSubject(),
-                            null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol.name())));
-
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-
-                    // 3. Validar acceso según la ruta
-                    String requestURI = request.getRequestURI();
-                    boolean accesoPermitido = true;
-
-                    if (requestURI.startsWith("/api/admin") && rol != Rol.ADMINISTRADOR) {
-                        accesoPermitido = false;
-                    } else if (requestURI.startsWith("/api/cliente") && rol != Rol.CIUDADANO) {
-                        accesoPermitido = false;
-                    }
-
-                    if (!accesoPermitido) {
-                        crearRespuestaError("No tiene permisos para acceder a este recurso",
-                                HttpServletResponse.SC_FORBIDDEN, response);
-                        return;
-                    }
-                } else {
-                    crearRespuestaError("Token no proporcionado", HttpServletResponse.SC_UNAUTHORIZED, response);
-                    return;
-                }
-
-                filterChain.doFilter(request, response);
-
-            } catch (ExpiredJwtException e) {
-                crearRespuestaError("El token está vencido", HttpServletResponse.SC_UNAUTHORIZED, response);
-            } catch (MalformedJwtException | SignatureException e) {
-                crearRespuestaError("Token inválido", HttpServletResponse.SC_FORBIDDEN, response);
-            } catch (Exception e) {
-                crearRespuestaError("Error de autenticación: " + e.getMessage(),
-                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response);
-            }
+        if (token == null) {
+            chain.doFilter(request, response);
+            return;
         }
+
+        try {
+            Jws<Claims> payload = jwtUtil.parseJwt(token);
+            String username = payload.getPayload().getSubject();
+            String role = payload.getPayload().get("rol", String.class);
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = new User(
+                        username,
+                        "",
+                        List.of(new SimpleGrantedAuthority(role)));
+
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: " + e.getMessage());
+            return;
+        }
+
+        chain.doFilter(request, response);
+
     }
 
     private String getToken(HttpServletRequest req) {

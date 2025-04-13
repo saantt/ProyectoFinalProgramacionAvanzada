@@ -11,6 +11,7 @@ import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.EditarReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.InfoReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteCreacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.exception.ResourceNotFoundException;
 import co.edu.uniquindio.proyectofinal.proyecto.model.EstadoReporte;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Reporte;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Ubicacion;
@@ -31,13 +32,13 @@ import java.util.stream.Collectors;
 @Service
 public class ReporteServiceImpl implements ReporteService {
 
-   
     private final ReporteRepository reporteRepositorio;
     private final UsuarioRepository usuarioRepositorio;
     private final ReporteMapper reporteMapper;
     private final WebSocketNotificationService webSocketNotificationService;
 
-    public ReporteServiceImpl(ReporteRepository reporteRepositorio, UsuarioRepository usuarioRepositorio, ReporteMapper reporteMapper, WebSocketNotificationService webSocketNotificationService) {
+    public ReporteServiceImpl(ReporteRepository reporteRepositorio, UsuarioRepository usuarioRepositorio,
+            ReporteMapper reporteMapper, WebSocketNotificationService webSocketNotificationService) {
         this.reporteRepositorio = reporteRepositorio;
         this.usuarioRepositorio = usuarioRepositorio;
         this.reporteMapper = reporteMapper;
@@ -63,20 +64,21 @@ public class ReporteServiceImpl implements ReporteService {
         if (!ObjectId.isValid(id)) {
             throw new IllegalArgumentException("El ID proporcionado no es válido: " + id);
         }
+
         ObjectId objectId = new ObjectId(id);
-        // Buscar el reporte existente
+
+        // Buscar el reporte existente - Cambiar a ResourceNotFoundException
         Reporte reporteExistente = reporteRepositorio.findById(objectId)
-                .orElseThrow(() -> new NoSuchElementException("No se encontró un reporte con el id: " + id));
-        // Utilizar el mapper para actualizar el documento existente
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró el reporte con ID: " + id));
+
+        // Resto del código permanece igual...
         reporteMapper.EditarReporteDTO(dto, reporteExistente);
-        // Guardar los cambios
         reporteRepositorio.save(reporteExistente);
-        // Notificar por WebSocket
+
         NotificacionDTO notificacionDTO = new NotificacionDTO(
                 "Reporte Actualizado",
                 "Se ha actualizado el reporte: " + reporteExistente.getTitulo(),
-                "reports"
-        );
+                "reports");
         webSocketNotificationService.notificarClientes(notificacionDTO);
     }
 
@@ -96,12 +98,12 @@ public class ReporteServiceImpl implements ReporteService {
         reporte.setEstadoActual(EstadoReporte.ELIMINADO);
 
         reporteRepositorio.save(reporte);
-        // Notificar por WebSocket que se eliminó un reporte (opcional, pero recomendable)
+        // Notificar por WebSocket que se eliminó un reporte (opcional, pero
+        // recomendable)
         NotificacionDTO notificacionDTO = new NotificacionDTO(
                 "Reporte Eliminado",
                 "Se ha eliminado el reporte: " + reporte.getTitulo(),
-                "reports"
-        );
+                "reports");
         webSocketNotificationService.notificarClientes(notificacionDTO);
     }
 
@@ -123,10 +125,11 @@ public class ReporteServiceImpl implements ReporteService {
     public void marcarImportante(String id) {
 
     }
-    //Pilas falta esto
+
+    // Pilas falta esto
     @Override
     public void cambiarEstadoReporte(String id, CambiarEstadoDTO cambiarEstadoDTO) {
-    //Lo mismo con comentartio que notifique via email
+        // Lo mismo con comentartio que notifique via email
     }
 
     @Override
@@ -135,7 +138,8 @@ public class ReporteServiceImpl implements ReporteService {
     }
 
     @Override
-    public List<InfoReporteDTO> obtenerReportes(String categoria, EstadoReporte estadoReporte, int pagina) throws Exception {
+    public List<InfoReporteDTO> obtenerReportes(String categoria, EstadoReporte estadoReporte, int pagina)
+            throws Exception {
         return List.of();
     }
 
@@ -170,8 +174,7 @@ public class ReporteServiceImpl implements ReporteService {
         NotificacionDTO notificacionDTO = new NotificacionDTO(
                 "Nuevo Reporte",
                 "Se acaba de crear un nuevo reporte: " + reporte.getTitulo(),
-                "reports"
-        );
+                "reports");
         webSocketNotificationService.notificarClientes(notificacionDTO);
     }
 }

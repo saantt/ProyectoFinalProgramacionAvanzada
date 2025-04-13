@@ -1,4 +1,5 @@
 package co.edu.uniquindio.proyectofinal.proyecto.controller;
+
 import co.edu.uniquindio.proyectofinal.proyecto.dto.MensajeDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.InfoReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.ActivarCuentaDTO;
@@ -12,8 +13,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/usuarios")
@@ -22,7 +27,8 @@ public class UsuarioController {
     private final UsuarioService usuarioServicio;
 
     @GetMapping("/{email}/reportes")
-    public ResponseEntity<MensajeDTO<List<InfoReporteDTO>>> obtenerReportesUsuario(@PathVariable String id) throws Exception {
+    public ResponseEntity<MensajeDTO<List<InfoReporteDTO>>> obtenerReportesUsuario(@PathVariable String id)
+            throws Exception {
         List<InfoReporteDTO> lista = usuarioServicio.obtenerReportesUsuario(id);
         return ResponseEntity.ok(new MensajeDTO<>(false, lista));
     }
@@ -38,8 +44,7 @@ public class UsuarioController {
     public ResponseEntity<MensajeDTO<List<UsuarioDTO>>> listarTodos(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String ciudad,
-            @RequestParam(defaultValue = "0") int pagina
-    ) {
+            @RequestParam(defaultValue = "0") int pagina) {
         List<UsuarioDTO> lista = usuarioServicio.listarTodos(nombre, ciudad, pagina);
         return ResponseEntity.ok(new MensajeDTO<>(false, lista));
     }
@@ -48,30 +53,35 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<MensajeDTO<String>> crear(@Valid @RequestBody CrearUsuarioDTO cuenta) throws Exception {
         usuarioServicio.crear(cuenta);
-        return ResponseEntity.ok(new MensajeDTO<>(false, "Registro exitoso. Verifica tu correo para activar tu cuenta."));
+        return ResponseEntity
+                .ok(new MensajeDTO<>(false, "Registro exitoso. Verifica tu correo para activar tu cuenta."));
     }
 
     @PostMapping("/codigoVerificacion")
-    public ResponseEntity<MensajeDTO<String>> enviarCodigoVerificacion(@RequestBody EnviarCodigoDTO enviarCodigoDTO) throws Exception {
+    public ResponseEntity<MensajeDTO<String>> enviarCodigoVerificacion(@RequestBody EnviarCodigoDTO enviarCodigoDTO)
+            throws Exception {
         usuarioServicio.enviarCodigoVerificacion(enviarCodigoDTO);
         return ResponseEntity.ok(new MensajeDTO<>(false, "Codigo enviado correctamente."));
     }
 
     // Edición de perfil
     @PutMapping("/{id}")
-    public ResponseEntity<MensajeDTO<String>> editar(@PathVariable String id, @Valid @RequestBody EditarUsuarioDTO editarUsuarioDTO) throws Exception {
-        usuarioServicio.editar(id,editarUsuarioDTO);
+    public ResponseEntity<MensajeDTO<String>> editar(@PathVariable String id,
+            @Valid @RequestBody EditarUsuarioDTO editarUsuarioDTO) throws Exception {
+        usuarioServicio.editar(id, editarUsuarioDTO);
         return ResponseEntity.ok(new MensajeDTO<>(false, "Perfil actualizado correctamente."));
     }
 
     @PutMapping("/{email}/password")
-    public ResponseEntity<MensajeDTO<String>> cambiarPassword(@RequestBody CambiarPasswordDTO cambiarPasswordDTO) throws Exception {
+    public ResponseEntity<MensajeDTO<String>> cambiarPassword(@RequestBody CambiarPasswordDTO cambiarPasswordDTO)
+            throws Exception {
         usuarioServicio.cambiarPassword(cambiarPasswordDTO);
         return ResponseEntity.ok(new MensajeDTO<>(false, "Password cambiado correctamente."));
     }
 
     @PutMapping("/{email}/activar")
-    public ResponseEntity<MensajeDTO<String>> activarCuenta(@RequestBody ActivarCuentaDTO activarCuentaDTO) throws Exception {
+    public ResponseEntity<MensajeDTO<String>> activarCuenta(@RequestBody ActivarCuentaDTO activarCuentaDTO)
+            throws Exception {
         usuarioServicio.activarCuenta(activarCuentaDTO);
         return ResponseEntity.ok(new MensajeDTO<>(false, "Activado correctamente."));
     }
@@ -83,21 +93,23 @@ public class UsuarioController {
         return ResponseEntity.ok(new MensajeDTO<>(false, "Cuenta eliminada correctamente."));
     }
 
-    //-----------------Preguntar al profesor----------------------------------------
+    // -----------------Preguntar al
+    // profesor----------------------------------------
 
-
-//
-//    // Login de usuario
-//    @PostMapping("/login")
-//    public ResponseEntity<MensajeDTO<TokenDTO>> login(@Valid @RequestBody LoginDTO loginDTO) throws Exception {
-//        TokenDTO token = usuarioServicio.login(loginDTO);
-//        return ResponseEntity.ok(new MensajeDTO<>(false, token));
-//    }
+    //
+    // // Login de usuario
+    // @PostMapping("/login")
+    // public ResponseEntity<MensajeDTO<TokenDTO>> login(@Valid @RequestBody
+    // LoginDTO loginDTO) throws Exception {
+    // TokenDTO token = usuarioServicio.login(loginDTO);
+    // return ResponseEntity.ok(new MensajeDTO<>(false, token));
+    // }
 
     // Validar si un email ya está registrado
-//    @GetMapping("/validar-email")
-//    public ResponseEntity<MensajeDTO<Boolean>> validarEmail(@RequestParam String email) {
-//        boolean existe = usuarioServicio.validarEmail(email);
-//        return ResponseEntity.ok(new MensajeDTO<>(false, existe));
-//    }
+    // @GetMapping("/validar-email")
+    // public ResponseEntity<MensajeDTO<Boolean>> validarEmail(@RequestParam String
+    // email) {
+    // boolean existe = usuarioServicio.validarEmail(email);
+    // return ResponseEntity.ok(new MensajeDTO<>(false, existe));
+    // }
 }

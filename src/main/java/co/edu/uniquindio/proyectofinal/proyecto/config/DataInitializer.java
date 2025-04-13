@@ -1,4 +1,4 @@
-/* package co.edu.uniquindio.proyectofinal.proyecto.config;
+package co.edu.uniquindio.proyectofinal.proyecto.config;
 
 import co.edu.uniquindio.proyectofinal.proyecto.model.Categoria;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
@@ -13,24 +13,26 @@ import org.springframework.stereotype.Component;
 public class DataInitializer implements CommandLineRunner {
 
     private final CategoriaRepository categoriaRepository;
-
+    private final BCryptPasswordEncoder passwordEncoder;
     private final UsuarioRepository usuarioRepository;
 
-    public DataInitializer(UsuarioRepository usuarioRepository, CategoriaRepository categoriaRepository) {
+    public DataInitializer(UsuarioRepository usuarioRepository, CategoriaRepository categoriaRepository,
+            BCryptPasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.categoriaRepository = categoriaRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        if (!usuarioRepository.existsByemail("milton@mail.com")) {
+        if (!usuarioRepository.existsByEmail("milton@mail.com")) {
             Usuario usuario = new Usuario(
                     "Milton",
                     "milton@mail.com",
-                    new BCryptPasswordEncoder().encode("123456"), // ¡Encripta la contraseña!
-                    Rol.ADMINISTRADOR // Asegúrate que Rol.USUARIO esté definido
-            );
+                    "3206991690",
+                    "Armenia", Rol.ADMINISTRADOR, null, passwordEncoder.encode("123456"), null, null);
             usuarioRepository.save(usuario);
+            System.out.println("Usuario creado EN ATLAS");
             System.out.println("✅ Usuario de prueba insertado correctamente.");
         } else {
             System.out.println("ℹ️ El usuario de prueba ya existe.");
@@ -46,4 +48,3 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 }
- */

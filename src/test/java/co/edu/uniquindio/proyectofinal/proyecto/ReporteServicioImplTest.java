@@ -13,6 +13,7 @@ import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.EditarReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteCreacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.UbicacionDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.exception.ResourceNotFoundException;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Reporte;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.ReporteRepository;
@@ -26,8 +27,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
 
 class ReporteServicioImplTest {
 
@@ -61,8 +62,7 @@ class ReporteServicioImplTest {
                 new UbicacionDTO(123.456, 78.910),
                 "categoria123",
                 true,
-                List.of("foto1.jpg", "foto2.jpg")
-        );
+                List.of("foto1.jpg", "foto2.jpg"));
         Usuario usuario = new Usuario();
         Reporte reporte = new Reporte();
         ObjectId clienteId = new ObjectId(crearReporteDTO.getClienteId());
@@ -77,6 +77,7 @@ class ReporteServicioImplTest {
         verify(reporteRepositorio).save(reporte);
         verify(webSocketNotificationService).notificarClientes(any());
     }
+
     @Test
     void crearReporteConUsuarioNoExistenteDebeLanzarExcepcion() {
         // Arrange
@@ -87,23 +88,21 @@ class ReporteServicioImplTest {
                 new UbicacionDTO(123.456, 78.910),
                 "categoria123",
                 true,
-                List.of("foto1.jpg", "foto2.jpg")
-        );
+                List.of("foto1.jpg", "foto2.jpg"));
         ObjectId clienteId = new ObjectId(crearReporteDTO.getClienteId());
         // Mock: usuario no encontrado
         when(usuarioRepositorio.findById(clienteId))
                 .thenReturn(Optional.empty());
         // Act & Assert
-        Exception exception = assertThrows(RuntimeException.class, () ->
-                reporteServicio.crearReporte(crearReporteDTO)
-        );
+        Exception exception = assertThrows(RuntimeException.class, () -> reporteServicio.crearReporte(crearReporteDTO));
         assertEquals("El usuario no existe o está inactivo", exception.getMessage());
         // Verificar que no se llamó al mapper ni al repositorio ni a la notificación
         verify(reporteMapper, never()).toDocument(any());
         verify(reporteRepositorio, never()).save(any());
         verify(webSocketNotificationService, never()).notificarClientes(any());
     }
-    //Test para editar
+
+    // Test para editar
     @Test
     void editarReporteExitosamente() throws Exception {
         // Arrange
@@ -116,8 +115,7 @@ class ReporteServicioImplTest {
                 new UbicacionDTO(123.456, 78.910),
                 "categoria123",
                 true,
-                List.of("foto1.jpg", "foto2.jpg")
-        );
+                List.of("foto1.jpg", "foto2.jpg"));
         Reporte reporteExistente = new Reporte();
         // Mock: reporte existente
         when(reporteRepositorio.findById(objectId))
@@ -129,6 +127,7 @@ class ReporteServicioImplTest {
         verify(reporteMapper).EditarReporteDTO(editarReporteDTO, reporteExistente);
         verify(reporteRepositorio).save(reporteExistente);
     }
+
     @Test
     void editarReporteConReporteNoExistenteDebeLanzarExcepcion() {
         // Arrange
@@ -140,17 +139,21 @@ class ReporteServicioImplTest {
                 new UbicacionDTO(123.456, 78.910),
                 "categoria123",
                 true,
-                List.of("foto1.jpg", "foto2.jpg")
-        );
-        // Mock: reporte no encontrado
+                List.of("foto1.jpg", "foto2.jpg"));
+
+        // Configuración explícita del mock
         when(reporteRepositorio.findById(objectId))
                 .thenReturn(Optional.empty());
+
         // Act & Assert
-        Exception exception = assertThrows(Exception.class, () ->
-                reporteServicio.actualizarReporte(reporteId, editarReporteDTO)
-        );
-        assertEquals("El reporte no existe", exception.getMessage());
-        // Verificar que no se haya llamado al mapper ni a guardar
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> // Cambiado a
+                                                                                  // ResourceNotFoundException
+        reporteServicio.actualizarReporte(reporteId, editarReporteDTO));
+
+        assertEquals("No se encontró el reporte con ID: " + reporteId, exception.getMessage());
+
+        // Verificaciones adicionales
+        verify(reporteRepositorio).findById(objectId);
         verify(reporteMapper, never()).EditarReporteDTO(any(), any());
         verify(reporteRepositorio, never()).save(any());
     }
@@ -178,8 +181,7 @@ class ReporteServicioImplTest {
                 new UbicacionDTO(123.12312, 2131.2312),
                 "644f1b5de3a5b768cbf453c9", // categoriaId
                 "Categoría Prueba",
-                List.of("foto1.jpg", "foto2.jpg")
-        );
+                List.of("foto1.jpg", "foto2.jpg"));
         // Simulamos comportamiento del repositorio
         Mockito.when(reporteRepositorio.findById(objectId)).thenReturn(Optional.of(reporte));
         // Simulamos comportamiento del mapper
@@ -203,6 +205,7 @@ class ReporteServicioImplTest {
         Mockito.verify(reporteRepositorio).findById(objectId);
         Mockito.verify(reporteMapper).toDTO(reporte);
     }
+
     @Test
     void obtenerReporte_IdInvalido_LanzaExcepcion() {
         // Arrange
@@ -213,10 +216,12 @@ class ReporteServicioImplTest {
             reporteServicio.obtener(idInvalido);
         });
 
-        // Verificamos que no se llamen las dependencias, porque el método debe fallar antes
+        // Verificamos que no se llamen las dependencias, porque el método debe fallar
+        // antes
         Mockito.verifyNoInteractions(reporteRepositorio);
         Mockito.verifyNoInteractions(reporteMapper);
     }
+
     @Test
     void obtenerReporte_NoExiste_LanzaExcepcion() {
         // Arrange

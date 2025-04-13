@@ -1,7 +1,5 @@
 package co.edu.uniquindio.proyectofinal.proyecto.controller;
 
-
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +11,12 @@ import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.services.ReporteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reportes")
@@ -31,11 +33,11 @@ public class ReporteController {
 
     // Editar un reporte existente
     @PutMapping("/{id}")
-    public ResponseEntity<MensajeDTO<String>> editar(@PathVariable String id, @Valid @RequestBody EditarReporteDTO dto) throws Exception {
+    public ResponseEntity<MensajeDTO<String>> editar(@PathVariable String id, @Valid @RequestBody EditarReporteDTO dto)
+            throws Exception {
         reporteServicio.actualizarReporte(id, dto);
         return ResponseEntity.ok(new MensajeDTO<>(false, "Reporte editado correctamente"));
     }
-    
 
     // Eliminar un reporte
     @DeleteMapping("/{id}")
@@ -51,17 +53,18 @@ public class ReporteController {
         return ResponseEntity.ok(reporte);
     }
 
-//    // Listar reportes con filtros opcionales
-//    @GetMapping
-//    public ResponseEntity<List<ReporteDTO>> listar(
-//            @RequestParam(required = false) String titulo,
-//            @RequestParam(required = false) String categoria,
-//            @RequestParam(required = false) String estado,
-//            @RequestParam(defaultValue = "0") int pagina
-//    ) {
-//        List<ReporteDTO> reportes = reporteServicio.listar(titulo, categoria, estado, pagina);
-//        return ResponseEntity.ok(reportes);
-//    }
+    // // Listar reportes con filtros opcionales
+    // @GetMapping
+    // public ResponseEntity<List<ReporteDTO>> listar(
+    // @RequestParam(required = false) String titulo,
+    // @RequestParam(required = false) String categoria,
+    // @RequestParam(required = false) String estado,
+    // @RequestParam(defaultValue = "0") int pagina
+    // ) {
+    // List<ReporteDTO> reportes = reporteServicio.listar(titulo, categoria, estado,
+    // pagina);
+    // return ResponseEntity.ok(reportes);
+    // }
 
     // Marcar un reporte como importante
     @PutMapping("/{id}/importante")
@@ -72,7 +75,8 @@ public class ReporteController {
 
     // Cambiar el estado de un reporte
     @PutMapping("/{id}/estado/{nuevoEstado}")
-    public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable CambiarEstadoDTO cambiarEstadoDTO) throws Exception {
+    public ResponseEntity<String> cambiarEstado(@PathVariable String id,
+            @PathVariable CambiarEstadoDTO cambiarEstadoDTO) throws Exception {
         reporteServicio.cambiarEstadoReporte(id, cambiarEstadoDTO);
         return ResponseEntity.ok("Estado del reporte actualizado a: " + cambiarEstadoDTO);
     }

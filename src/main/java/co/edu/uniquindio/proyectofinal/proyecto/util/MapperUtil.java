@@ -5,5 +5,4 @@ import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
 
 public class MapperUtil {
 
-    
 }

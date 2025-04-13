@@ -1,6 +1,6 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.EmailDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.email.EmailDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.InfoReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.ActivarCuentaDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.CambiarPasswordDTO;
@@ -40,44 +40,48 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final MongoTemplate mongoTemplate;
     private final EmailService emailServicio;
-
-
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void crear(CrearUsuarioDTO crearUsuarioDTO) throws Exception {
-        if( existeEmail(crearUsuarioDTO.email()) ){
-            throw new Exception("El correo "+crearUsuarioDTO.email()+" ya está en uso");
+        if (existeEmail(crearUsuarioDTO.email())) {
+            throw new Exception("El correo " + crearUsuarioDTO.email() + " ya está en uso");
         }
+
         Usuario usuario = usuarioMapper.toDocument(crearUsuarioDTO);
+        // Encripta la contraseña
+        usuario.setPassword(passwordEncoder.encode(crearUsuarioDTO.password()));
+
         String codigoActivacion = generarCodigo();
         usuario.setCodigoValidacion(new CodigoValidacion(
                 codigoActivacion,
-                LocalDateTime.now()
-        ));
+                LocalDateTime.now()));
+
         usuarioRepositorio.save(usuario);
         String asunto = "Verificación de cuenta";
         String destinatario = usuario.getEmail(); // Primero declaras el destinatario
 
         String cuerpo = """
-        <html>
-            <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-                <div style="max-width: 600px; margin: auto; background-color: white; padding: 20px; border-radius: 8px;">
-                    <h2 style="color: #4CAF50; text-align: center;">Verificación de cuenta</h2>
-                    <p>¡Hola <strong>%s</strong>!</p>
-                    <p>Tu código de verificación es:</p>
-                    <h1 style="background-color: #eee; padding: 10px; border-radius: 4px; text-align: center;">%s</h1>
-                    <p>Si no solicitaste este código, por favor ignora este correo.</p>
-                    <p style="font-size: 12px; color: #888;">Este es un correo automático, por favor no respondas.</p>
-                </div>
-            </body>
-        </html>
-        """.formatted(usuario.getNombre(), codigoActivacion);
+                <html>
+                    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <div style="max-width: 600px; margin: auto; background-color: white; padding: 20px; border-radius: 8px;">
+                            <h2 style="color: #4CAF50; text-align: center;">Verificación de cuenta</h2>
+                            <p>¡Hola <strong>%s</strong>!</p>
+                            <p>Tu código de verificación es:</p>
+                            <h1 style="background-color: #eee; padding: 10px; border-radius: 4px; text-align: center;">%s</h1>
+                            <p>Si no solicitaste este código, por favor ignora este correo.</p>
+                            <p style="font-size: 12px; color: #888;">Este es un correo automático, por favor no respondas.</p>
+                        </div>
+                    </body>
+                </html>
+                """
+                .formatted(usuario.getNombre(), codigoActivacion);
         emailServicio.enviarCorreo(new EmailDTO(asunto, cuerpo, destinatario));
 
     }
 
     @Override
-    public void editar(String id,EditarUsuarioDTO editarUsuarioDTO) throws Exception {
+    public void editar(String id, EditarUsuarioDTO editarUsuarioDTO) throws Exception {
         Usuario usuario = obtenerUsuarioPorId(id);
         usuarioMapper.editarUsuarioDTO(editarUsuarioDTO, usuario);
         usuarioRepositorio.save(usuario);
@@ -103,14 +107,15 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public  List<UsuarioDTO> listarTodos(String nombre, String ciudad, int pagina) {
-        if(pagina < 0) throw new RuntimeException("La página no puede ser menor a 0");
+    public List<UsuarioDTO> listarTodos(String nombre, String ciudad, int pagina) {
+        if (pagina < 0)
+            throw new RuntimeException("La página no puede ser menor a 0");
         // Crear criterios dinámicos
         Criteria criteria = new Criteria();
         if (nombre != null && !nombre.isEmpty()) {
             criteria.and("nombre").regex(nombre, "i"); // Ignora a mayúsculas/minúsculas
         }
-        if (ciudad!= null && !ciudad.isEmpty()) {
+        if (ciudad != null && !ciudad.isEmpty()) {
             criteria.and("ciudad").regex(ciudad, "i");
         }
         // Crear la consulta con los criterios y la paginación de 5 elementos por página
@@ -132,7 +137,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepositorio.findByEmail(email).isPresent();
     }
 
-    //Metodo utilizado en crear, editar y eliminar (Metodo de apoyo para no repetir codigo)
+    // Metodo utilizado en crear, editar y eliminar (Metodo de apoyo para no repetir
+    // codigo)
     private Usuario obtenerUsuarioPorId(String id) throws Exception {
         if (!ObjectId.isValid(id)) {
             throw new ResourceNotFoundException("El ID proporcionado no es válido: " + id);
@@ -142,7 +148,8 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró el usuario con el id " + id));
     }
 
-    //Metodo usado en activarCuenta y cambiarPassword para obtener el usuario por email
+    // Metodo usado en activarCuenta y cambiarPassword para obtener el usuario por
+    // email
     private Usuario obtenerPorEmail(String email) throws ResourceNotFoundException {
         Optional<Usuario> usuarioOptional = usuarioRepositorio.findByEmail(email);
         if (usuarioOptional.isEmpty()) {
@@ -161,16 +168,15 @@ public class UsuarioServiceImpl implements UsuarioService {
         return codigo.toString();
     }
 
-    //Envia el codigo para cambiar password
+    // Envia el codigo para cambiar password
     @Override
     public void enviarCodigoVerificacion(EnviarCodigoDTO enviarCodigoDTO) throws Exception {
-       Usuario usuario = obtenerPorEmail(enviarCodigoDTO.email());
-       String codigo = generarCodigo();
-       usuario.setCodigoValidacion(new CodigoValidacion(
-               codigo,
-               LocalDateTime.now()
-       ));
-       usuarioRepositorio.save(usuario);
+        Usuario usuario = obtenerPorEmail(enviarCodigoDTO.email());
+        String codigo = generarCodigo();
+        usuario.setCodigoValidacion(new CodigoValidacion(
+                codigo,
+                LocalDateTime.now()));
+        usuarioRepositorio.save(usuario);
         String asunto = "Restablecer Password";
         String cuerpo = "¡Hola " + usuario.getNombre() + "! Tu código para cambiar password es: " + codigo;
         String destinatario = usuario.getEmail();
@@ -180,13 +186,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public void cambiarPassword(CambiarPasswordDTO cambiarPasswordDTO) throws Exception {
         Usuario usuario = obtenerPorEmail(cambiarPasswordDTO.email());
-        if(!usuario.getCodigoValidacion().getCodigo().equals(cambiarPasswordDTO.codigoValidacion())) {
+        if (!usuario.getCodigoValidacion().getCodigo().equals(cambiarPasswordDTO.codigoValidacion())) {
             throw new Exception("El código de verificación es incorrecto");
         }
         if (usuario.getCodigoValidacion() == null) {
             throw new Exception("No usuario no tiene un código de verificación");
         }
-        if(!LocalDateTime.now().isBefore(usuario.getCodigoValidacion().getFechaCreacion().plusMinutes(15))) {
+        if (!LocalDateTime.now().isBefore(usuario.getCodigoValidacion().getFechaCreacion().plusMinutes(15))) {
             throw new Exception("El código de verificación ha caducado");
         }
         usuario.setPassword(cambiarPasswordDTO.nuevaPassword());
@@ -197,10 +203,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public void activarCuenta(ActivarCuentaDTO activarCuentaDTO) throws Exception {
         Usuario usuario = obtenerPorEmail(activarCuentaDTO.email());
-        if(!usuario.getCodigoValidacion().getCodigo().equals(activarCuentaDTO.codigoValidacion())) {
+        if (!usuario.getCodigoValidacion().getCodigo().equals(activarCuentaDTO.codigoValidacion())) {
             throw new Exception("El código de verificación es incorrecto");
         }
-        if(!LocalDateTime.now().isBefore(usuario.getCodigoValidacion().getFechaCreacion().plusMinutes(15))) {
+        if (!LocalDateTime.now().isBefore(usuario.getCodigoValidacion().getFechaCreacion().plusMinutes(15))) {
             throw new Exception("El código de verificación ha caducado");
         }
         if (usuario.getCodigoValidacion() == null) {
