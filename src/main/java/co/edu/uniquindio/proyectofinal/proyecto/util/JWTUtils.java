@@ -3,28 +3,22 @@ package co.edu.uniquindio.proyectofinal.proyecto.util;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
-
-import co.edu.uniquindio.proyectofinal.proyecto.model.enums.Rol;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Map;
-
 import java.util.Date;
 
 @Component
 
 public class JWTUtils {
 
-    public String generarToken(String email, Map<String, Object> claims) { // Cambia a String
+    public String generarToken(String email, String rol) { // Cambia a String
         Instant now = Instant.now();
 
         return Jwts.builder()
-                .claims(claims)
+                .claim("rol", rol)
                 .subject(email) // Usamos directamente el email
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(1L, ChronoUnit.HOURS)))
@@ -42,6 +36,11 @@ public class JWTUtils {
         String claveSecreta = "secretsecretsecretsecretsecretsecretsecretsecret";
         byte[] secretKeyBytes = claveSecreta.getBytes();
         return Keys.hmacShaKeyFor(secretKeyBytes);
+    }
+
+    public String obtenerRolDesdeToken(String token) throws Exception {
+        Jws<Claims> claims = parseJwt(token); // Reutiliza tu método existente
+        return claims.getBody().get("rol", String.class);
     }
 
 }

@@ -2,7 +2,6 @@ package co.edu.uniquindio.proyectofinal.proyecto.config;
 
 import co.edu.uniquindio.proyectofinal.proyecto.security.JwtAuthenticationFilter;
 import co.edu.uniquindio.proyectofinal.proyecto.security.config.JwtAuthenticationEntryPoint;
-//import co.edu.uniquindio.proyectofinal.proyecto.services.impl.DetalleUsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,16 +33,58 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos (sin autenticación)
                         .requestMatchers(
-                                "/api/auth/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**")
-                        .permitAll()
+                                "/api/auth/**", // Autenticación
+                                "/v3/api-docs/**", // Documentación OpenAPI
+                                "/swagger-ui/**", // Interfaz Swagger UI
+                                "/api/diagnostico/**", // Prueba Token
+                                "/swagger-ui.html", // Interfaz Swagger UI HTML
+                                "/swagger-resources/**", // Recursos Swagger
+                                "/webjars/**" // WebJars para Swagger
+                        ).permitAll()
+
+                        // Endpoints de usuarios
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Registro abierto
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios").hasAuthority("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/**")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/**")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**").hasAuthority("ADMINISTRADOR")
+
+                        // Endpoints de reportes
+                        .requestMatchers(HttpMethod.GET, "/api/reportes/**")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/reportes")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/reportes/**")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/reportes/**").hasAuthority("ADMINISTRADOR")
+
+                        // Endpoints de comentarios
+                        .requestMatchers(HttpMethod.GET, "/api/comentarios/**")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/comentarios/**")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/comentarios/**")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/comentarios/**").hasAuthority("ADMINISTRADOR")
+
+                        // Endpoints de categorías
+                        .requestMatchers(HttpMethod.GET, "/api/categorias").permitAll() // Listado público
+                        .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll() // Detalle público
+                        .requestMatchers(HttpMethod.POST, "/api/categorias").hasAuthority("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/categorias/**").hasAuthority("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categorias/**").hasAuthority("ADMINISTRADOR")
+
+                        // Todos los demás endpoints requieren autenticación
                         .anyRequest().authenticated())
+
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -25,21 +25,17 @@ public class AutenticacionServiceImpl implements AutenticacionService {
 
     @Override
     public LoginResponseDTO login(@Valid LoginRequestDTO loginRequestDTO) throws Exception {
-        // 1. Buscar usuario por email (usando el método correcto del repositorio)
         Usuario usuario = usuarioRepository.findByEmail(loginRequestDTO.getEmail())
                 .orElseThrow(() -> new Exception("Usuario no encontrado"));
 
-        // 2. Validar contraseña
         if (!passwordEncoder.matches(loginRequestDTO.getPassword(), usuario.getPassword())) {
             throw new Exception("Contraseña incorrecta");
         }
 
-        // 3. Generar token JWT con el rol
-        String token = jwtUtils.generarToken(
-                usuario.getEmail(), // ← Correo como subject
-                Map.of("rol", usuario.getRol().name()));
+        // Asegúrate que usuario.getRol() devuelve "CIUDADANO" o "ADMINISTRADOR"
+        // exactamente
+        String token = jwtUtils.generarToken(usuario.getEmail(), usuario.getRol().name());
 
-        // 4. Retornar respuesta
         return new LoginResponseDTO(token);
     }
 }

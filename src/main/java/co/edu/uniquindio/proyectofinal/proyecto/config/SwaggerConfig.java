@@ -17,15 +17,13 @@ public class SwaggerConfig {
         @Bean
         public OpenAPI customOpenAPI() {
                 return new OpenAPI()
-                                .info(new Info()
-                                                .title("API - Plataforma Seguridad Ciudadana")
-                                                .version("1.0")
-                                                .description("Documentación de la API"))
                                 .components(new Components()
                                                 .addSecuritySchemes("bearerAuth",
                                                                 new SecurityScheme()
                                                                                 .type(SecurityScheme.Type.HTTP)
                                                                                 .scheme("bearer")
-                                                                                .bearerFormat("JWT")));
+                                                                                .bearerFormat("JWT")))
+                                .info(new Info().title("API Documentation").version("1.0"))
+                                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
         }
 }

@@ -43,9 +43,7 @@ public class CuentaServicioImpl implements CuentaServicio {
         }
 
         return new TokenDTO(
-                jwtUtils.generarToken(
-                        usuario.getEmail(),
-                        Map.of("rol", usuario.getRol().name())));
+                jwtUtils.generarToken(usuario.getEmail(), usuario.getRol().name()));
     }
 
     @Override

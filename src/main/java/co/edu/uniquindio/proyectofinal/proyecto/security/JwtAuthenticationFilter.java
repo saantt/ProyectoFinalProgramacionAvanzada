@@ -38,10 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
         String token = getToken(request);
 
@@ -51,36 +49,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            Jws<Claims> payload = jwtUtil.parseJwt(token);
-            String username = payload.getPayload().getSubject();
-            String role = payload.getPayload().get("rol", String.class);
+            Jws<Claims> jws = jwtUtil.parseJwt(token);
+            Claims claims = jws.getBody();
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = new User(
-                        username,
-                        "",
-                        List.of(new SimpleGrantedAuthority(role)));
+            String email = claims.getSubject();
+            String rol = claims.get("rol", String.class);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (email == null || rol == null) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido: faltan claims");
+                return;
             }
 
+            // Crea la autenticación sin agregar "ROLE_" al rol
+            UserDetails userDetails = new User(
+                    email,
+                    "",
+                    List.of(new SimpleGrantedAuthority(rol)));
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            chain.doFilter(request, response);
+
+        } catch (ExpiredJwtException e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expirado");
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: " + e.getMessage());
-            return;
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
         }
-
-        chain.doFilter(request, response);
-
     }
 
-    private String getToken(HttpServletRequest req) {
-        String header = req.getHeader("Authorization");
-        return header != null && header.startsWith("Bearer ") ? header.replace("Bearer ", "") : null;
+    private String getToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
     }
 
     private void crearRespuestaError(String mensaje, int codigoError, HttpServletResponse response) throws IOException {

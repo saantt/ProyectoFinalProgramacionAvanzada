@@ -17,8 +17,11 @@ import co.edu.uniquindio.proyectofinal.proyecto.services.impl.EmailServicioImpl;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import static org.awaitility.Awaitility.await;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 @ExtendWith(MockitoExtension.class)
-class EmailServicioImplTest {
+class EmailServiceImplTest {
 
     @Mock
     private Mailer mailer;
@@ -28,41 +31,75 @@ class EmailServicioImplTest {
 
     @BeforeEach
     void setUp() {
-        // Configuración para pruebas
-        emailServicio = new EmailServicioImpl(mailer);
-        emailServicio.setSmtpUsername("prueba@correo.com");
-        emailServicio.setSmtpName("Nombre Remitente");
+        ReflectionTestUtils.setField(emailServicio, "smtpUsername", "prueba@correo.com");
+        ReflectionTestUtils.setField(emailServicio, "smtpName", "Nombre Remitente");
     }
 
     @Test
     void enviarCorreo_DeberiaEnviarCorreoCorrectamente() throws Exception {
-        EmailDTO emailDTO = new EmailDTO(
-                "Asunto de prueba",
-                "<p>Cuerpo del correo de prueba</p>",
-                "destinatario@correo.com");
+        // Arrange
+        EmailDTO emailDTO = new EmailDTO("Asunto", "<p>Cuerpo</p>", "dest@test.com");
 
+        // Act
         emailServicio.enviarCorreo(emailDTO);
 
-        verify(mailer, times(1)).sendMail(any(Email.class));
+        // Assert
+        await().atMost(2, SECONDS)
+                .untilAsserted(() -> verify(mailer).sendMail(any(Email.class)));
+    }
+
+    @Test
+    void enviarCorreo_DeberiaLanzarExcepcionCuandoDestinatarioEsNulo() {
+        // Arrange
+        EmailDTO emailDTO = new EmailDTO("Asunto", "<p>Cuerpo</p>", null);
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            emailServicio.enviarCorreo(emailDTO);
+        });
+
+        verify(mailer, never()).sendMail(any());
     }
 
     @Test
     void enviarCorreo_DeberiaConstruirCorreoCorrectamente() throws Exception {
+        // Arrange
         EmailDTO emailDTO = new EmailDTO(
                 "Asunto de prueba",
                 "<p>Cuerpo del correo de prueba</p>",
                 "destinatario@correo.com");
 
-        ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
-
+        // Act
         emailServicio.enviarCorreo(emailDTO);
 
-        verify(mailer).sendMail(emailCaptor.capture());
-        Email emailEnviado = emailCaptor.getValue();
+        // Assert
+        ArgumentCaptor<Email> emailCaptor = ArgumentCaptor.forClass(Email.class);
 
-        assertEquals("Asunto de prueba", emailEnviado.getSubject());
-        assertEquals("destinatario@correo.com", emailEnviado.getRecipients().get(0).getAddress());
-        assertEquals("prueba@correo.com", emailEnviado.getFromRecipient().getAddress());
-        assertTrue(emailEnviado.getHTMLText().contains("Cuerpo del correo de prueba"));
+        await().atMost(2, SECONDS).untilAsserted(() -> {
+            verify(mailer).sendMail(emailCaptor.capture());
+            Email emailEnviado = emailCaptor.getValue();
+
+            assertAll(
+                    () -> assertEquals("Asunto de prueba", emailEnviado.getSubject()),
+                    () -> assertEquals("destinatario@correo.com",
+                            emailEnviado.getRecipients().get(0).getAddress()),
+                    () -> assertEquals("prueba@correo.com",
+                            emailEnviado.getFromRecipient().getAddress()),
+                    () -> assertTrue(emailEnviado.getHTMLText()
+                            .contains("Cuerpo del correo de prueba")));
+        });
+    }
+
+    @Test
+    void enviarCorreo_DeberiaLanzarExcepcionCuandoDestinatarioEstaVacio() {
+        // Arrange
+        EmailDTO emailDTO = new EmailDTO("Asunto", "<p>Cuerpo</p>", "   ");
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            emailServicio.enviarCorreo(emailDTO);
+        });
+
+        verify(mailer, never()).sendMail(any());
     }
 }

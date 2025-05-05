@@ -30,10 +30,12 @@ public interface ReporteMapper {
     @Mapping(target = "contadorImportante", ignore = true)
     @Mapping(target = "historial", ignore = true)
     void EditarReporteDTO(EditarReporteDTO dto, @MappingTarget Reporte reporte);
+
     // Conversión personalizada de String a ObjectId
     default ObjectId map(String value) {
         return new ObjectId(value);
     }
+
     // ✅ Conversión personalizada de ObjectId a String (para toDTO)
     default String map(ObjectId value) {
         return value != null ? value.toHexString() : null;
@@ -43,6 +45,7 @@ public interface ReporteMapper {
     default Ubicacion mapUbicacionDTO(UbicacionDTO dto) {
         return new Ubicacion(dto.latitud(), dto.longitud());
     }
+
     // Conversión de documento a DTO
     ReporteDTO toDTO(Reporte reporte);
 }

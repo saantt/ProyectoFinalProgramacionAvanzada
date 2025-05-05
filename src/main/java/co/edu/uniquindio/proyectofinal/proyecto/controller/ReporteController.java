@@ -1,5 +1,6 @@
 package co.edu.uniquindio.proyectofinal.proyecto.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +10,7 @@ import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.EditarReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteCreacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.services.ReporteService;
+import co.edu.uniquindio.proyectofinal.proyecto.util.JWTUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,12 +25,17 @@ import java.util.List;
 public class ReporteController {
 
     private final ReporteService reporteServicio;
+    // private JWTUtils jwtUtils;
 
-    // Crear un nuevo reporte
     @PostMapping
-    public ResponseEntity<MensajeDTO<String>> crear(@Valid @RequestBody ReporteCreacionDTO reporte) throws Exception {
-        reporteServicio.crearReporte(reporte);
-        return ResponseEntity.ok(new MensajeDTO<>(false, "Reporte creado exitosamente"));
+    public ResponseEntity<MensajeDTO<String>> crear(@Valid @RequestBody ReporteCreacionDTO reporte) {
+        try {
+            reporteServicio.crearReporte(reporte);
+            return ResponseEntity.ok(new MensajeDTO<>(false, "Reporte creado exitosamente"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MensajeDTO<>(true, "Error al crear reporte: " + e.getMessage()));
+        }
     }
 
     // Editar un reporte existente
