@@ -49,14 +49,16 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         Usuario usuario = usuarioMapper.toDocument(crearUsuarioDTO);
-        // Encripta la contraseña
         usuario.setPassword(passwordEncoder.encode(crearUsuarioDTO.password()));
 
-        String codigoActivacion = generarCodigo();
-        usuario.setCodigoValidacion(new CodigoValidacion(
-                codigoActivacion,
-                LocalDateTime.now()));
+        // Usa el builder correctamente
+        CodigoValidacion codigoValidacion = CodigoValidacion.builder()
+                .codigo(generarCodigo())
+                .fechaCreacion(LocalDateTime.now())
+                .email(usuario.getEmail()) // Campo requerido
+                .build();
 
+        usuario.setCodigoValidacion(codigoValidacion);
         usuarioRepositorio.save(usuario);
         String asunto = "Verificación de cuenta";
         String destinatario = usuario.getEmail(); // Primero declaras el destinatario
@@ -75,7 +77,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                     </body>
                 </html>
                 """
-                .formatted(usuario.getNombre(), codigoActivacion);
+                .formatted(usuario.getNombre(), codigoValidacion);
         emailServicio.enviarCorreo(new EmailDTO(asunto, cuerpo, destinatario));
 
     }
@@ -172,13 +174,17 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public void enviarCodigoVerificacion(EnviarCodigoDTO enviarCodigoDTO) throws Exception {
         Usuario usuario = obtenerPorEmail(enviarCodigoDTO.email());
-        String codigo = generarCodigo();
-        usuario.setCodigoValidacion(new CodigoValidacion(
-                codigo,
-                LocalDateTime.now()));
+
+        CodigoValidacion codigoValidacion = CodigoValidacion.builder()
+                .codigo(generarCodigo())
+                .fechaCreacion(LocalDateTime.now())
+                .email(usuario.getEmail()) // Campo requerido
+                .build();
+
+        usuario.setCodigoValidacion(codigoValidacion);
         usuarioRepositorio.save(usuario);
         String asunto = "Restablecer Password";
-        String cuerpo = "¡Hola " + usuario.getNombre() + "! Tu código para cambiar password es: " + codigo;
+        String cuerpo = "¡Hola " + usuario.getNombre() + "! Tu código para cambiar password es: " + codigoValidacion;
         String destinatario = usuario.getEmail();
         emailServicio.enviarCorreo(new EmailDTO(asunto, cuerpo, destinatario));
     }

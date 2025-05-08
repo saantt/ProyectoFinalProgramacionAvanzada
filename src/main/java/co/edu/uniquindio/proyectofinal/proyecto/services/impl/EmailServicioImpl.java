@@ -22,33 +22,28 @@ public class EmailServicioImpl implements EmailService {
     @Value("${spring.mail.username}")
     private String smtpUsername;
 
-    @Value("Nombre Remitente") // O puedes ponerlo en properties: @Value("${mail.sender.name}")
-    private String smtpName;
-
-    // Setters
-    public void setSmtpUsername(String smtpUsername) {
-        this.smtpUsername = smtpUsername;
-    }
-
-    public void setSmtpName(String smtpName) {
-        this.smtpName = smtpName;
-    }
-
     @Override
     @Async("taskExecutor")
     public void enviarCorreo(EmailDTO emailDTO) throws Exception {
-        if (emailDTO.destinatario() == null || emailDTO.destinatario().isBlank()) {
-            throw new IllegalArgumentException("El destinatario del correo no puede ser nulo.");
+        try {
+            if (emailDTO.destinatario() == null || emailDTO.destinatario().isBlank()) {
+                throw new IllegalArgumentException("El destinatario no puede estar vacío");
+            }
+
+            Email email = EmailBuilder.startingBlank()
+                    .from("Tu Aplicación", smtpUsername)
+                    .to(emailDTO.destinatario())
+                    .withSubject(emailDTO.asunto())
+                    .withHTMLText(emailDTO.cuerpo())
+                    .buildEmail();
+
+            log.info("Intentando enviar correo a {}", emailDTO.destinatario());
+            mailer.sendMail(email);
+            log.info("Correo enviado exitosamente a {}", emailDTO.destinatario());
+
+        } catch (Exception e) {
+            log.error("Error enviando correo a {}: {}", emailDTO.destinatario(), e.getMessage());
+            throw new Exception("Error al enviar el correo: " + e.getMessage());
         }
-
-        Email email = EmailBuilder.startingBlank()
-                .from(smtpUsername)
-                .to(emailDTO.destinatario())
-                .withSubject(emailDTO.asunto())
-                .withHTMLText(emailDTO.cuerpo())
-                .buildEmail();
-
-        log.info("Enviando correo a {}", emailDTO.destinatario());
-        mailer.sendMail(email);
     }
 }
