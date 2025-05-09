@@ -126,10 +126,29 @@ public class ReporteServiceImpl implements ReporteService {
 
     }
 
-    // Pilas falta esto
     @Override
     public void cambiarEstadoReporte(String id, CambiarEstadoDTO cambiarEstadoDTO) {
-        // Lo mismo con comentartio que notifique via email
+        if (!ObjectId.isValid(id)) {
+            throw new IllegalArgumentException("ID no válido: " + id);
+        }
+
+        Reporte reporte = reporteRepositorio.findById(new ObjectId(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Reporte no encontrado"));
+
+        // Actualizar el estado
+        EstadoReporte nuevoEstado = new EstadoReporte();
+        nuevoEstado.setEstado(cambiarEstadoDTO.getNuevoEstado());
+        reporte.setEstadoActual(nuevoEstado);
+
+        // Guardar cambios
+        reporteRepositorio.save(reporte);
+
+        // Notificación opcional
+        NotificacionDTO notificacion = new NotificacionDTO(
+                "Estado actualizado",
+                "El estado del reporte " + reporte.getTitulo() + " ha cambiado a " + cambiarEstadoDTO.getNuevoEstado(),
+                "reports");
+        webSocketNotificationService.notificarClientes(notificacion);
     }
 
     @Override

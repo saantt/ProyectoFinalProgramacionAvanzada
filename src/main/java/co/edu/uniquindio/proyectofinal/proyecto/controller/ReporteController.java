@@ -81,10 +81,11 @@ public class ReporteController {
     }
 
     // Cambiar el estado de un reporte
-    @PutMapping("/{id}/estado/{nuevoEstado}")
-    public ResponseEntity<String> cambiarEstado(@PathVariable String id,
-            @PathVariable CambiarEstadoDTO cambiarEstadoDTO) throws Exception {
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<String> cambiarEstado(
+            @PathVariable String id,
+            @Valid @RequestBody CambiarEstadoDTO cambiarEstadoDTO) throws Exception {
         reporteServicio.cambiarEstadoReporte(id, cambiarEstadoDTO);
-        return ResponseEntity.ok("Estado del reporte actualizado a: " + cambiarEstadoDTO);
+        return ResponseEntity.ok("Estado del reporte actualizado a: " + cambiarEstadoDTO.getNuevoEstado());
     }
 }
