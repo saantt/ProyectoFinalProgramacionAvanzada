@@ -33,11 +33,3 @@ public class AutenticacionControlador {
         }
     }
 }
-
-// @PostMapping("/crear-cuenta")
-// public ResponseEntity<MensajeDTO<String>> crearCuenta(@Valid @RequestBody
-// CrearCuentaDTO cuenta) throws Exception {
-// cuentaServicio.crearCuenta(cuenta);
-// return ResponseEntity.ok(new MensajeDTO<>(false, "Cuenta creada
-// exitosamente"));
-// }
