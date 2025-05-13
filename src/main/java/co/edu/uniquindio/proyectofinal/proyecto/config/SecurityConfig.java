@@ -40,6 +40,7 @@ public class SecurityConfig {
                         // Endpoints públicos (sin autenticación)
                         .requestMatchers(
                                 "/api/auth/**", // Autenticación
+                                "/api/usuarios/{email}/activar", // Codigo de activación
                                 "/v3/api-docs/**", // Documentación OpenAPI
                                 "/swagger-ui/**", // Interfaz Swagger UI
                                 "/api/diagnostico/**", // Prueba Token

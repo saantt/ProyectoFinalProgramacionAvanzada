@@ -17,6 +17,7 @@ import co.edu.uniquindio.proyectofinal.proyecto.dto.usuario.ItemCuentaDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Cuenta;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Reporte;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
+import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoUsuario;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.*;
 import co.edu.uniquindio.proyectofinal.proyecto.services.CuentaServicio;
 import co.edu.uniquindio.proyectofinal.proyecto.util.JWTUtils;
@@ -34,6 +35,10 @@ public class CuentaServicioImpl implements CuentaServicio {
     public TokenDTO iniciarSesion(LoginDTO loginDTO) throws Exception {
         Usuario usuario = usuarioRepository.findByEmail(loginDTO.email())
                 .orElseThrow(() -> new Exception("Credenciales inválidas"));
+
+        if (usuario.getEstado() != EstadoUsuario.ACTIVO) {
+            throw new Exception("Debe activar su cuenta antes de iniciar sesión");
+        }
 
         System.out.println("Password ingresado: " + loginDTO.password());
         System.out.println("Password almacenado: " + usuario.getPassword());

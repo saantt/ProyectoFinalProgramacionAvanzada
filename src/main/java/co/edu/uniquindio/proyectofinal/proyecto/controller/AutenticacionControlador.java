@@ -12,9 +12,6 @@ import co.edu.uniquindio.proyectofinal.proyecto.dto.auth.TokenDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.services.CuentaServicio;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequiredArgsConstructor

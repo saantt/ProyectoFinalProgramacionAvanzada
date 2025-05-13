@@ -93,23 +93,4 @@ public class UsuarioController {
         return ResponseEntity.ok(new MensajeDTO<>(false, "Cuenta eliminada correctamente."));
     }
 
-    // -----------------Preguntar al
-    // profesor----------------------------------------
-
-    //
-    // // Login de usuario
-    // @PostMapping("/login")
-    // public ResponseEntity<MensajeDTO<TokenDTO>> login(@Valid @RequestBody
-    // LoginDTO loginDTO) throws Exception {
-    // TokenDTO token = usuarioServicio.login(loginDTO);
-    // return ResponseEntity.ok(new MensajeDTO<>(false, token));
-    // }
-
-    // Validar si un email ya está registrado
-    // @GetMapping("/validar-email")
-    // public ResponseEntity<MensajeDTO<Boolean>> validarEmail(@RequestParam String
-    // email) {
-    // boolean existe = usuarioServicio.validarEmail(email);
-    // return ResponseEntity.ok(new MensajeDTO<>(false, existe));
-    // }
 }
