@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -40,6 +41,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final MongoTemplate mongoTemplate;
     private final EmailService emailServicio;
+
+    @Autowired
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -201,7 +204,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (!LocalDateTime.now().isBefore(usuario.getCodigoValidacion().getFechaCreacion().plusMinutes(15))) {
             throw new Exception("El código de verificación ha caducado");
         }
-        usuario.setPassword(cambiarPasswordDTO.nuevaPassword());
+        usuario.setPassword(passwordEncoder.encode(cambiarPasswordDTO.nuevaPassword()));
         usuario.setCodigoValidacion(null);
         usuarioRepositorio.save(usuario);
     }
