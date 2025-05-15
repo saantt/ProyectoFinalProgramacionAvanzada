@@ -34,7 +34,7 @@ public class AutenticacionServiceImpl implements AutenticacionService {
 
         // Asegúrate que usuario.getRol() devuelve "CIUDADANO" o "ADMINISTRADOR"
         // exactamente
-        String token = jwtUtils.generarToken(usuario.getEmail(), usuario.getRol().name());
+        String token = jwtUtils.generarToken(usuario.getId().toString(), usuario.getEmail(), usuario.getRol().name());
 
         return new LoginResponseDTO(token);
     }

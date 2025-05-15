@@ -14,12 +14,13 @@ import java.util.Date;
 
 public class JWTUtils {
 
-    public String generarToken(String email, String rol) { // Cambia a String
+    public String generarToken(String id, String email, String rol) { // Cambia a String
         Instant now = Instant.now();
 
         return Jwts.builder()
                 .claim("rol", rol)
-                .subject(email) // Usamos directamente el email
+                .claim("email", email)
+                .subject(id)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(1L, ChronoUnit.HOURS)))
                 .signWith(getKey())
