@@ -53,25 +53,17 @@ public class ReporteController {
         return ResponseEntity.ok("Reporte eliminado correctamente");
     }
 
-    // Obtener un reporte específico
-    @GetMapping("/{id}")
-    public ResponseEntity<ReporteDTO> obtener(@PathVariable String id) throws Exception {
-        ReporteDTO reporte = reporteServicio.obtener(id);
-        return ResponseEntity.ok(reporte);
+    // Obtener reportes
+    @GetMapping
+    public ResponseEntity<MensajeDTO<List<ReporteDTO>>> listarTodos() {
+        try {
+            List<ReporteDTO> lista = reporteServicio.obtener();
+            return ResponseEntity.ok(new MensajeDTO<>(false, lista));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MensajeDTO<>(true, null));
+        }
     }
-
-    // // Listar reportes con filtros opcionales
-    // @GetMapping
-    // public ResponseEntity<List<ReporteDTO>> listar(
-    // @RequestParam(required = false) String titulo,
-    // @RequestParam(required = false) String categoria,
-    // @RequestParam(required = false) String estado,
-    // @RequestParam(defaultValue = "0") int pagina
-    // ) {
-    // List<ReporteDTO> reportes = reporteServicio.listar(titulo, categoria, estado,
-    // pagina);
-    // return ResponseEntity.ok(reportes);
-    // }
 
     // Marcar un reporte como importante
     @PutMapping("/{id}/importante")

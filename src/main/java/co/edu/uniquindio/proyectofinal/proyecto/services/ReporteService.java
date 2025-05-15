@@ -14,14 +14,25 @@ import jakarta.validation.Valid;
 
 public interface ReporteService {
     void crearReporte(@Valid ReporteCreacionDTO reporte) throws Exception;
+
     void eliminarReporte(String id) throws Exception;
+
     void actualizarReporte(String id, EditarReporteDTO reporte) throws Exception;
-    ReporteDTO obtener(String id) throws Exception;
+
+    // ReporteDTO obtener(String id) throws Exception;
+    List<ReporteDTO> obtener() throws Exception;
+
     void marcarImportante(String id) throws Exception;
+
     void cambiarEstadoReporte(String id, CambiarEstadoDTO estado) throws Exception;
+
     InfoReporteDTO obtenerReporte(String id) throws Exception;
+
     List<InfoReporteDTO> obtenerReportes(String categoria, EstadoReporte estadoReporte, int pagina) throws Exception;
+
     List<InfoReporteDTO> obtenerReportesUsuario(String idusuario, int pagina) throws Exception;
+
     List<InfoReporteDTO> obtenerReportes(Ubicacion ubicacion) throws Exception;
+
     List<HistorialEStadoDTO> listarHistorialEstados(String id) throws Exception;
 }

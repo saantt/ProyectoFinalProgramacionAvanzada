@@ -108,17 +108,11 @@ public class ReporteServiceImpl implements ReporteService {
     }
 
     @Override
-    public ReporteDTO obtener(String id) {
-        // Validar que el ID tenga formato correcto
-        if (!ObjectId.isValid(id)) {
-            throw new IllegalArgumentException("El ID proporcionado no es válido: " + id);
-        }
-        ObjectId objectId = new ObjectId(id);
-        // Buscar el reporte por ID
-        Reporte reporte = reporteRepositorio.findById(objectId)
-                .orElseThrow(() -> new NoSuchElementException("No se encontró un reporte con el id: " + id));
-        // Convertir el documento a DTO usando el mapper
-        return reporteMapper.toDTO(reporte);
+    public List<ReporteDTO> obtener() {
+        List<Reporte> reportes = reporteRepositorio.findAll();
+        return reportes.stream()
+                .map(reporteMapper::toDTO)
+                .toList();
     }
 
     @Override
