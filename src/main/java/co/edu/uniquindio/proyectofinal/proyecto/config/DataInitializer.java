@@ -2,6 +2,7 @@ package co.edu.uniquindio.proyectofinal.proyecto.config;
 
 import co.edu.uniquindio.proyectofinal.proyecto.model.Categoria;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
+import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoUsuario;
 import co.edu.uniquindio.proyectofinal.proyecto.model.enums.Rol;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.CategoriaRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.UsuarioRepository;
@@ -30,7 +31,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Milton",
                     "milton@mail.com",
                     "3206991690",
-                    "Armenia", Rol.ADMINISTRADOR, null, passwordEncoder.encode("123456"), null, null);
+                    "Armenia", Rol.ADMINISTRADOR, EstadoUsuario.ACTIVO, passwordEncoder.encode("123456"), null, null);
             usuarioRepository.save(usuario);
             System.out.println("Usuario creado EN ATLAS");
             System.out.println("✅ Usuario de prueba insertado correctamente.");
