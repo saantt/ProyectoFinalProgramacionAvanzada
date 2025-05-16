@@ -30,8 +30,8 @@ public class Reporte {
     private LocalDateTime fecha;
     private List<HistorialReporte> historial;
     private EstadoReporte estadoActual;
-    @Field(name = "contadorImportante")
-    private Integer contadorImportante;
+    // @Field(name = "contadorImportante")
+    private Integer contadorImportante = 0;
 
     @Builder
     public Reporte(String titulo, ObjectId categoriaid, String descripcion, Ubicacion ubicacion, List<String> fotos,

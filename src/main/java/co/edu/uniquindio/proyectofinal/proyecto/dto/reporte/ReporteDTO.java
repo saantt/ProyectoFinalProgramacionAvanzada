@@ -10,7 +10,7 @@ import java.util.List;
 
 import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.UbicacionDTO;
 
-public record ReporteDTO (
+public record ReporteDTO(
         String id,
         String titulo,
         String descripcion,
@@ -22,5 +22,6 @@ public record ReporteDTO (
         UbicacionDTO ubicacion,
         String categoriaId,
         String nombreCategoria,
-        List<String> fotos
-){}
+        List<String> fotos,
+        Integer contadorImportante) {
+}
