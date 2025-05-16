@@ -117,7 +117,27 @@ public class ReporteServiceImpl implements ReporteService {
 
     @Override
     public void marcarImportante(String id) {
+        if (!ObjectId.isValid(id)) {
+            throw new IllegalArgumentException("ID no válido: " + id);
+        }
 
+        Reporte reporte = reporteRepositorio.findById(new ObjectId(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Reporte no encontrado con id: " + id));
+
+        // Cambia entre 0 y 1
+        int nuevoValor = (reporte.getContadorImportante() != null && reporte.getContadorImportante() == 1) ? 0 : 1;
+        reporte.setContadorImportante(nuevoValor);
+        reporteRepositorio.save(reporte);
+
+        // Notificación WebSocket
+        String mensaje = (nuevoValor == 1) ? "marcado como importante" : "desmarcado como importante";
+
+        NotificacionDTO notificacionDTO = new NotificacionDTO(
+                "Importancia actualizada",
+                "El reporte '" + reporte.getTitulo() + "' fue " + mensaje,
+                "reports");
+
+        webSocketNotificationService.notificarClientes(notificacionDTO);
     }
 
     @Override

@@ -1,12 +1,10 @@
 package co.edu.uniquindio.proyectofinal.proyecto.model;
 
-
-
-
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +20,7 @@ public class Reporte {
     @Id
     @EqualsAndHashCode.Include
     private ObjectId id;
-    
+
     private String titulo;
     private ObjectId categoriaId;
     private String descripcion;
@@ -32,11 +30,13 @@ public class Reporte {
     private LocalDateTime fecha;
     private List<HistorialReporte> historial;
     private EstadoReporte estadoActual;
-    private int contadorImportante;
-
+    @Field(name = "contadorImportante")
+    private Integer contadorImportante;
 
     @Builder
-    public Reporte(String titulo, ObjectId categoriaid, String descripcion, Ubicacion ubicacion, List<String> fotos, ObjectId clienteId, LocalDateTime fecha, List<HistorialReporte> historial, EstadoReporte estadoActual, int contadorImportante) {
+    public Reporte(String titulo, ObjectId categoriaid, String descripcion, Ubicacion ubicacion, List<String> fotos,
+            ObjectId clienteId, LocalDateTime fecha, List<HistorialReporte> historial, EstadoReporte estadoActual,
+            Integer contadorImportante) {
         this.titulo = titulo;
         this.categoriaId = categoriaid;
         this.descripcion = descripcion;
