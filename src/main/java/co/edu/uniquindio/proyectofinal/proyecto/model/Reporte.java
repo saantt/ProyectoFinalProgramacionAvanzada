@@ -29,7 +29,7 @@ public class Reporte {
     private ObjectId clienteId; // Referencia al usuario que creó el reporte
     private LocalDateTime fecha;
     private List<HistorialReporte> historial;
-    private EstadoReporte estadoActual;
+    private EstadoReporte estadoActual = EstadoReporte.PENDIENTE;
     // @Field(name = "contadorImportante")
     private Integer contadorImportante = 0;
 
