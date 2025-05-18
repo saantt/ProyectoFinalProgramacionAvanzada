@@ -67,6 +67,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/reportes/**")
                         .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/reportes/**").hasAuthority("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/reportes/informe")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/reportes/informe/pdf")
+                        .hasAnyAuthority("CIUDADANO", "ADMINISTRADOR")
 
                         // Endpoints de comentarios
                         .requestMatchers(HttpMethod.GET, "/api/comentarios/**")
@@ -108,6 +112,10 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:8080"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*")); // Para evitar problemas con headers personalizados
+        config.setExposedHeaders(List.of(
+                "Content-Disposition", // ¡Clave para descargas!
+                "Content-Type",
+                "Authorization"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

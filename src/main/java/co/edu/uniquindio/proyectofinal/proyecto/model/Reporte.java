@@ -32,11 +32,12 @@ public class Reporte {
     private EstadoReporte estadoActual = EstadoReporte.PENDIENTE;
     // @Field(name = "contadorImportante")
     private Integer contadorImportante = 0;
+    private String sector;
 
     @Builder
     public Reporte(String titulo, ObjectId categoriaid, String descripcion, Ubicacion ubicacion, List<String> fotos,
             ObjectId clienteId, LocalDateTime fecha, List<HistorialReporte> historial, EstadoReporte estadoActual,
-            Integer contadorImportante) {
+            Integer contadorImportante, String sector) {
         this.titulo = titulo;
         this.categoriaId = categoriaid;
         this.descripcion = descripcion;
@@ -47,5 +48,6 @@ public class Reporte {
         this.historial = historial;
         this.estadoActual = estadoActual;
         this.contadorImportante = contadorImportante;
+        this.sector = sector;
     }
 }

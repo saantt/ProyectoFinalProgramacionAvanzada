@@ -7,16 +7,30 @@ import org.springframework.web.bind.annotation.*;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.MensajeDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.estado.CambiarEstadoDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.EditarReporteDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.FiltroInformeDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.InformeGeneradoDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteCreacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteInformeDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.services.ReporteService;
 import co.edu.uniquindio.proyectofinal.proyecto.util.JWTUtils;
+import org.springframework.http.ContentDisposition;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.*;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.*;
+
+import org.springframework.http.HttpHeaders;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @RestController
@@ -80,4 +94,50 @@ public class ReporteController {
         reporteServicio.cambiarEstadoReporte(id, cambiarEstadoDTO);
         return ResponseEntity.ok("Estado del reporte actualizado a: " + cambiarEstadoDTO.getNuevoEstado());
     }
+
+    @GetMapping("/informe")
+    public ResponseEntity<MensajeDTO<InformeGeneradoDTO>> generarInforme(
+            @RequestParam String categoriaId,
+            @RequestParam String sector,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
+
+        LocalDateTime fechaInicioUTC = fechaInicio.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"))
+                .toLocalDateTime();
+        LocalDateTime fechaFinUTC = fechaFin.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"))
+                .toLocalDateTime();
+
+        FiltroInformeDTO filtro = new FiltroInformeDTO(categoriaId, sector, fechaInicioUTC, fechaFinUTC);
+
+        InformeGeneradoDTO informe = reporteServicio.generarInforme(filtro);
+        return ResponseEntity.ok(new MensajeDTO<>(false, informe));
+    }
+
+    @GetMapping(value = "/informe/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    @CrossOrigin(origins = { "http://localhost:4200", "http://localhost:8080" }) // Doble seguridad
+    public ResponseEntity<byte[]> generarInformePDF(
+            @RequestParam(required = false) String categoriaId,
+            @RequestParam(required = false) String sector,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
+
+        LocalDateTime fechaInicioUTC = fechaInicio.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"))
+                .toLocalDateTime();
+        LocalDateTime fechaFinUTC = fechaFin.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"))
+                .toLocalDateTime();
+
+        FiltroInformeDTO filtro = new FiltroInformeDTO(categoriaId, sector, fechaInicioUTC, fechaFinUTC);
+
+        byte[] pdfBytes = reporteServicio.generarInformePDF(filtro);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+                ContentDisposition.builder("attachment")
+                        .filename("informe_reportes.pdf")
+                        .build());
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
+
 }

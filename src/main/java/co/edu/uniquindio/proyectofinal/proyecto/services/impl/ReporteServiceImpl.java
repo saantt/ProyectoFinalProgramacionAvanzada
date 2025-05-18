@@ -1,32 +1,29 @@
 package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
-import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import co.edu.uniquindio.proyectofinal.proyecto.dto.estado.CambiarEstadoDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.estado.HistorialEStadoDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.notificacion.NotificacionDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.EditarReporteDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.InfoReporteDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteCreacionDTO;
-import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.exception.ResourceNotFoundException;
-import co.edu.uniquindio.proyectofinal.proyecto.model.EstadoReporte;
-import co.edu.uniquindio.proyectofinal.proyecto.model.Reporte;
-import co.edu.uniquindio.proyectofinal.proyecto.model.Ubicacion;
-import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
 import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoReporteEnum;
 import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoUsuario;
+import co.edu.uniquindio.proyectofinal.proyecto.repository.CategoriaRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.ReporteRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.UsuarioRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.services.ReporteService;
 import co.edu.uniquindio.proyectofinal.proyecto.util.ReporteMapper;
 
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.*;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.ubicacion.UbicacionDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.model.*;
+import co.edu.uniquindio.proyectofinal.proyecto.repository.ReporteRepository;
+import co.edu.uniquindio.proyectofinal.proyecto.util.PDFGenerator;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,19 +35,28 @@ public class ReporteServiceImpl implements ReporteService {
     private final WebSocketNotificationService webSocketNotificationService;
 
     public ReporteServiceImpl(ReporteRepository reporteRepositorio, UsuarioRepository usuarioRepositorio,
-            ReporteMapper reporteMapper, WebSocketNotificationService webSocketNotificationService) {
+            ReporteMapper reporteMapper, WebSocketNotificationService webSocketNotificationService,
+            CategoriaRepository categoriaRepository) {
         this.reporteRepositorio = reporteRepositorio;
         this.usuarioRepositorio = usuarioRepositorio;
         this.reporteMapper = reporteMapper;
         this.webSocketNotificationService = webSocketNotificationService;
+        this.categoriaRepository = categoriaRepository;
     }
 
     @Override
     public void crearReporte(ReporteCreacionDTO dto) {
         // Buscar usuario o lanzar excepción personalizada
         Usuario usuario = obtenerUsuarioActivo(dto.getClienteId());
-        // Crear el documento Reporte a partir del DTO
+
+        ObjectId categoriaId = new ObjectId(dto.getCategoriaId());
+
+        Categoria categoria = categoriaRepository.findById(categoriaId)
+                .orElseThrow(() -> new RuntimeException("La categoría no existe"));
+
         Reporte reporte = reporteMapper.toDocument(dto);
+        reporte.setCategoriaId(categoriaId);
+
         asignarDatosAdicionales(reporte);
         // Guardar el reporte en la base de datos
         reporteRepositorio.save(reporte);
@@ -210,4 +216,80 @@ public class ReporteServiceImpl implements ReporteService {
                 "reports");
         webSocketNotificationService.notificarClientes(notificacionDTO);
     }
+
+    private final CategoriaRepository categoriaRepository;
+
+    @Override
+    public InformeGeneradoDTO generarInforme(FiltroInformeDTO filtro) {
+        List<Reporte> reportesFiltrados = filtrarReportes(filtro);
+
+        // Versión corregida con paréntesis balanceados
+        Map<String, Integer> reportesPorCategoria = reportesFiltrados.stream()
+                .collect(Collectors.groupingBy(
+                        r -> {
+                            Categoria categoria = categoriaRepository.findById(r.getCategoriaId())
+                                    .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada"));
+                            // .orElse(new Categoria("Desconocida"));
+                            return categoria.getNombre();
+                        },
+                        Collectors.summingInt(r -> 1)));
+
+        Map<String, Integer> reportesPorEstado = reportesFiltrados.stream()
+                .collect(Collectors.groupingBy(
+                        r -> r.getEstadoActual().getEstado().name(),
+                        Collectors.summingInt(r -> 1)));
+
+        int totalImportantes = (int) reportesFiltrados.stream()
+                .filter(r -> r.getContadorImportante() == 1)
+                .count();
+
+        List<ReporteInformeDTO> reportesDTO = reportesFiltrados.stream()
+                .map(this::convertirAReporteInformeDTO)
+                .collect(Collectors.toList());
+
+        return new InformeGeneradoDTO(
+                "Informe de Reportes",
+                LocalDateTime.now(),
+                "Del " + filtro.fechaInicio() + " al " + filtro.fechaFin(),
+                reportesFiltrados.size(),
+                reportesDTO,
+                new EstadisticasInformeDTO(
+                        reportesFiltrados.size(),
+                        totalImportantes,
+                        reportesPorCategoria,
+                        reportesPorEstado));
+    }
+
+    @Override
+    public byte[] generarInformePDF(FiltroInformeDTO filtro) {
+        InformeGeneradoDTO informe = generarInforme(filtro);
+        return PDFGenerator.generarInformePDF(informe);
+    }
+
+    private List<Reporte> filtrarReportes(FiltroInformeDTO filtro) {
+        // Esto automáticamente usará la implementación de MongoTemplate
+        return reporteRepositorio.findByFilters(
+                filtro.categoriaId(), // String
+                filtro.sector(), // String
+                filtro.fechaInicio(), // LocalDateTime
+                filtro.fechaFin() // LocalDateTime
+        );
+    }
+
+    private ReporteInformeDTO convertirAReporteInformeDTO(Reporte reporte) {
+        // Obtener el nombre de la categoría (necesitarás inyectar CategoriaRepository)
+        String nombreCategoria = categoriaRepository.findById(reporte.getCategoriaId())
+                .map(Categoria::getNombre)
+                .orElse("Desconocida");
+
+        return new ReporteInformeDTO(
+                reporte.getTitulo(),
+                reporte.getDescripcion(),
+                reporte.getFecha(),
+                new UbicacionDTO(reporte.getUbicacion().getLatitud(), reporte.getUbicacion().getLongitud()),
+                nombreCategoria,
+                reporte.getContadorImportante() == 1,
+                reporte.getEstadoActual().getEstado().name());
+    }
+
 }

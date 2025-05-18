@@ -5,11 +5,14 @@ import java.util.List;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.estado.CambiarEstadoDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.estado.HistorialEStadoDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.EditarReporteDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.FiltroInformeDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.InfoReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteCreacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.ReporteDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.model.EstadoReporte;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Ubicacion;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.FiltroInformeDTO;
+import co.edu.uniquindio.proyectofinal.proyecto.dto.reporte.InformeGeneradoDTO;
 import jakarta.validation.Valid;
 
 public interface ReporteService {
@@ -35,4 +38,9 @@ public interface ReporteService {
     List<InfoReporteDTO> obtenerReportes(Ubicacion ubicacion) throws Exception;
 
     List<HistorialEStadoDTO> listarHistorialEstados(String id) throws Exception;
+
+    InformeGeneradoDTO generarInforme(FiltroInformeDTO filtro);
+
+    byte[] generarInformePDF(FiltroInformeDTO filtro);
+
 }

@@ -18,7 +18,11 @@ import co.edu.uniquindio.proyectofinal.proyecto.model.Ubicacion;
 @Mapper(componentModel = "spring")
 public interface ReporteMapper {
 
+    // @Mapping(target = "categoriaId", expression = "java(new
+    // ObjectId(dto.getCategoriaId()))")
+
     @Mapping(target = "ubicacion", source = "ubicacion")
+
     Reporte toDocument(ReporteCreacionDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
