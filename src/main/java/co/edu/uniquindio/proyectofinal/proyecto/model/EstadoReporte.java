@@ -13,23 +13,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 public class EstadoReporte {
 
-    @Id
-    private String id;
+        @Id
+        private String id;
 
-    private String idReporte;
-    private String reporteId;
-    private String nombre;
-    private EstadoReporteEnum estado;
-    private String observacion;
+        private String idReporte;
+        private String reporteId;
+        private String nombre;
+        private EstadoReporteEnum estado;
+        private String observacion;
 
-    // ✅ Estados estáticos válidos
-    public static final EstadoReporte PENDIENTE = EstadoReporte.builder()
-            .nombre("Pendiente")
-            .estado(EstadoReporteEnum.PENDIENTE)
-            .build();
+        // ✅ Estados estáticos válidos
+        public static final EstadoReporte PENDIENTE = EstadoReporte.builder()
+                        .nombre("Pendiente")
+                        .estado(EstadoReporteEnum.PENDIENTE)
+                        .build();
 
-    public static final EstadoReporte ELIMINADO = EstadoReporte.builder()
-            .nombre("Eliminado")
-            .estado(EstadoReporteEnum.ELIMINADO) // O el enum que represente "eliminado"
-            .build();
+        public static final EstadoReporte ELIMINADO = EstadoReporte.builder()
+                        .nombre("Eliminado")
+                        .estado(EstadoReporteEnum.ELIMINADO)
+                        .build();
 }

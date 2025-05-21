@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NotificacionCreacionDTO {
-    private String mensaje;
-    private String idUsuario;
+    String UsuarioId;
+    String sector;
 }

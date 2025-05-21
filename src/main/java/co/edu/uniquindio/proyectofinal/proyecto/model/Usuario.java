@@ -26,6 +26,7 @@ public class Usuario {
     private String ciudad;
     private Rol rol;
     private EstadoUsuario estado;
+    private String sector;
 
     @Field("password")
     private String password;

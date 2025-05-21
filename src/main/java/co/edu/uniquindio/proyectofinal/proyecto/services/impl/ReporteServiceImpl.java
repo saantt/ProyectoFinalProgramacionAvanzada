@@ -2,6 +2,7 @@ package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import co.edu.uniquindio.proyectofinal.proyecto.dto.estado.CambiarEstadoDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.estado.HistorialEStadoDTO;
@@ -12,6 +13,7 @@ import co.edu.uniquindio.proyectofinal.proyecto.model.enums.EstadoUsuario;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.CategoriaRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.ReporteRepository;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.UsuarioRepository;
+import co.edu.uniquindio.proyectofinal.proyecto.services.NotificationService;
 import co.edu.uniquindio.proyectofinal.proyecto.services.ReporteService;
 import co.edu.uniquindio.proyectofinal.proyecto.util.ReporteMapper;
 
@@ -33,35 +35,58 @@ public class ReporteServiceImpl implements ReporteService {
     private final UsuarioRepository usuarioRepositorio;
     private final ReporteMapper reporteMapper;
     private final WebSocketNotificationService webSocketNotificationService;
+    private final NotificationService notificationService;
 
     public ReporteServiceImpl(ReporteRepository reporteRepositorio, UsuarioRepository usuarioRepositorio,
             ReporteMapper reporteMapper, WebSocketNotificationService webSocketNotificationService,
-            CategoriaRepository categoriaRepository) {
+            CategoriaRepository categoriaRepository, NotificationService notificationService) {
         this.reporteRepositorio = reporteRepositorio;
         this.usuarioRepositorio = usuarioRepositorio;
         this.reporteMapper = reporteMapper;
         this.webSocketNotificationService = webSocketNotificationService;
         this.categoriaRepository = categoriaRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
     public void crearReporte(ReporteCreacionDTO dto) {
         // Buscar usuario o lanzar excepción personalizada
-        Usuario usuario = obtenerUsuarioActivo(dto.getClienteId());
+        if (!ObjectId.isValid(dto.getClienteId())) {
+            throw new IllegalArgumentException("ID de cliente no válido");
+        }
 
+        ObjectId clienteId = new ObjectId(dto.getClienteId());
+        Usuario usuario = usuarioRepositorio.findById(clienteId)
+                .filter(u -> u.getEstado() != EstadoUsuario.ELIMINADO)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado o inactivo"));
+
+        // 2. Validar y obtener categoría
         ObjectId categoriaId = new ObjectId(dto.getCategoriaId());
-
         Categoria categoria = categoriaRepository.findById(categoriaId)
                 .orElseThrow(() -> new RuntimeException("La categoría no existe"));
 
+        // 3. Crear y guardar reporte
         Reporte reporte = reporteMapper.toDocument(dto);
         reporte.setCategoriaId(categoriaId);
-
+        reporte.setClienteId(clienteId); // Asegurar que tiene clienteId
         asignarDatosAdicionales(reporte);
-        // Guardar el reporte en la base de datos
-        reporteRepositorio.save(reporte);
+        Reporte reporteGuardado = reporteRepositorio.save(reporte);
+
         // Enviar notificación por WebSocket
-        notificarNuevoReporte(reporte);
+        try {
+            notificationService.crearYEnviarNotificacion(
+                    "Nuevo reporte creado",
+                    String.format("Has creado un nuevo reporte: '%s' (Categoría: %s)",
+                            reporteGuardado.getTitulo(),
+                            categoria.getNombre()),
+                    clienteId.toHexString(), // Convertir ObjectId a String
+                    "CREACION", // Tipo de notificación para creación
+                    true // Enviar email
+            );
+        } catch (Exception e) {
+            System.err.println("ERROR al notificar creación de reporte: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -89,28 +114,42 @@ public class ReporteServiceImpl implements ReporteService {
     }
 
     @Override
+    @Transactional
     public void eliminarReporte(String id) {
-        // Validar el ID
+        // 1. Validar ID
         if (!ObjectId.isValid(id)) {
-            throw new IllegalArgumentException("El ID proporcionado no es válido: " + id);
+            throw new IllegalArgumentException("ID de reporte no válido: " + id);
         }
-        // Buscar el reporte por ID
-        ObjectId objectId = new ObjectId(id);
-        Optional<Reporte> optionalReporte = reporteRepositorio.findById(objectId);
-        if (optionalReporte.isEmpty()) {
-            throw new NoSuchElementException("No se encontró un reporte con el id: " + id);
-        }
-        Reporte reporte = optionalReporte.get();
-        reporte.setEstadoActual(EstadoReporte.ELIMINADO);
 
+        // 2. Obtener reporte
+        ObjectId reporteId = new ObjectId(id);
+        Reporte reporte = reporteRepositorio.findById(reporteId)
+                .orElseThrow(() -> new NoSuchElementException("Reporte no encontrado con id: " + id));
+
+        // 3. Verificar que tenga clienteId
+        if (reporte.getClienteId() == null) {
+            throw new IllegalStateException("El reporte no tiene un cliente asociado");
+        }
+
+        // 4. Actualizar estado
+        EstadoReporte estadoEliminado = new EstadoReporte();
+        estadoEliminado.setEstado(EstadoReporteEnum.ELIMINADO);
+        reporte.setEstadoActual(estadoEliminado);
         reporteRepositorio.save(reporte);
-        // Notificar por WebSocket que se eliminó un reporte (opcional, pero
-        // recomendable)
-        NotificacionDTO notificacionDTO = new NotificacionDTO(
-                "Reporte Eliminado",
-                "Se ha eliminado el reporte: " + reporte.getTitulo(),
-                "reports");
-        webSocketNotificationService.notificarClientes(notificacionDTO);
+
+        // 5. Enviar notificación
+        try {
+            notificationService.crearYEnviarNotificacion(
+                    "Reporte eliminado",
+                    String.format("El reporte '%s' ha sido eliminado", reporte.getTitulo()),
+                    reporte.getClienteId().toHexString(), // Convertir ObjectId a String
+                    "ELIMINACION", // Tipo de notificación
+                    true // Enviar email
+            );
+        } catch (Exception e) {
+            System.err.println("ERROR al notificar eliminación de reporte: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -163,12 +202,27 @@ public class ReporteServiceImpl implements ReporteService {
         // Guardar cambios
         reporteRepositorio.save(reporte);
 
-        // Notificación opcional
-        NotificacionDTO notificacion = new NotificacionDTO(
-                "Estado actualizado",
-                "El estado del reporte " + reporte.getTitulo() + " ha cambiado a " + cambiarEstadoDTO.getNuevoEstado(),
-                "reports");
-        webSocketNotificationService.notificarClientes(notificacion);
+        // DEBUG: Verificar usuarioId
+        String estadoAnterior = reporte.getEstadoActual().getEstado().name();
+        String clienteIdString = reporte.getClienteId().toHexString();
+        System.out.println("ClienteId (ObjectId): " + reporte.getClienteId());
+        System.out.println("ClienteId (String): " + clienteIdString);
+
+        // Enviar notificación (versión mejorada)
+        try {
+            notificationService.crearYEnviarNotificacion(
+                    "Estado de reporte actualizado",
+                    String.format("El estado de tu reporte '%s' ha cambiado de %s a %s",
+                            reporte.getTitulo(),
+                            estadoAnterior,
+                            cambiarEstadoDTO.getNuevoEstado()),
+                    clienteIdString, // Enviamos el ID como String
+                    cambiarEstadoDTO.getNuevoEstado().name(),
+                    true);
+        } catch (Exception e) {
+            System.err.println("ERROR al enviar notificación: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override

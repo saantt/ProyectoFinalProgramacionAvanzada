@@ -1,49 +1,86 @@
-/* package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+package co.edu.uniquindio.proyectofinal.proyecto.services.impl;
 
-import co.edu.uniquindio.proyectofinal.proyecto.dto.notificacion.NotificacionCreacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.dto.notificacion.NotificacionDTO;
 import co.edu.uniquindio.proyectofinal.proyecto.model.Notificacion;
+import co.edu.uniquindio.proyectofinal.proyecto.model.Usuario;
+import co.edu.uniquindio.proyectofinal.proyecto.model.enums.TipoNotificacion;
 import co.edu.uniquindio.proyectofinal.proyecto.repository.NotificacionRepository;
-import co.edu.uniquindio.proyectofinal.proyecto.services.NotificacionService;
+import co.edu.uniquindio.proyectofinal.proyecto.repository.UsuarioRepository;
+import co.edu.uniquindio.proyectofinal.proyecto.services.NotificationService;
+import lombok.RequiredArgsConstructor;
+
+import org.bson.types.ObjectId;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class NotificacionServiceImpl implements NotificacionService {
+public class NotificacionServiceImpl implements NotificationService {
 
     private final NotificacionRepository notificacionRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final JavaMailSender mailSender;
+    private final UsuarioRepository usuarioRepository;
 
     @Override
-    public void enviarNotificacion(NotificacionCreacionDTO dto) {
-        Notificacion notificacion = new Notificacion();
-        notificacion.setMensaje(dto.getMensaje());
-        notificacion.setId(dto.getIdUsuario());
-        notificacion.setFechaCreacion(LocalDateTime.now());
+    @Transactional
+    public void enviarNotificacion(Notificacion notificacion) {
+        // 1. Guardar en BD
+        Notificacion guardada = notificacionRepository.save(notificacion);
 
-        notificacionRepository.save(notificacion);
+        // 2. Convertir a DTO
+        NotificacionDTO dto = NotificacionDTO.fromEntity(guardada);
+
+        // 3. Enviar por WebSocket
+        messagingTemplate.convertAndSendToUser(
+                guardada.getUsuarioId(),
+                "/queue/notificaciones",
+                dto);
+
+        // 4. Enviar email si está configurado
+        if (guardada.isEnviarEmail()) {
+            enviarEmail(dto);
+        }
     }
 
     @Override
-    public List<NotificacionDTO> listarNotificacionesUsuario(String idUsuario) {
-        return notificacionRepository.findById(idUsuario)
-                .stream()
-                .map(n -> new NotificacionDTO(
-                        n.getId(),
-                        n.getMensaje(),
-                        n.getId(),
-                        n.getFechaCreacion()
-                )).collect(Collectors.toList());
+    @Transactional
+    public void crearYEnviarNotificacion(String titulo, String mensaje, String usuarioId,
+            String tipoNotificacion, boolean enviarEmail) {
+        // Obtener email del usuario
+        ObjectId usuarioObjectId = new ObjectId(usuarioId);
+
+        // Obtener email del usuario
+        String usuarioEmail = usuarioRepository.findById(usuarioObjectId)
+                .map(Usuario::getEmail)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Crear entidad
+        Notificacion notificacion = Notificacion.builder()
+                .titulo(titulo)
+                .mensaje(mensaje)
+                .usuarioId(usuarioId)
+                .usuarioEmail(usuarioEmail)
+                .tipoNotificacion(tipoNotificacion)
+                .fechaCreacion(LocalDateTime.now())
+                .leida(false)
+                .enviarEmail(enviarEmail)
+                .build();
+
+        // Usar el método principal
+        enviarNotificacion(notificacion);
     }
 
-    @Override
-    public Object obtenerNotificaciones(String idUsuario) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerNotificaciones'");
+    private void enviarEmail(NotificacionDTO notificacion) {
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(notificacion.getUsuarioEmail());
+        email.setSubject(notificacion.getTitle());
+        email.setText(notificacion.getMessage());
+        mailSender.send(email);
     }
 }
- */

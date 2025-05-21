@@ -9,11 +9,12 @@ import co.edu.uniquindio.proyectofinal.proyecto.model.Notificacion;
 import java.util.List;
 
 @Repository
-public interface NotificacionRepository extends MongoRepository<Notificacion, ObjectId> {
-    
-    List<Notificacion> findByUsuarioId(ObjectId usuarioId);
-    
-    List<Notificacion> findByUsuarioIdAndLeida(ObjectId usuarioId, boolean leida);
-    
-    long countByUsuarioIdAndLeida(ObjectId usuarioId, boolean leida);
+public interface NotificacionRepository extends MongoRepository<Notificacion, String> {
+
+    List<Notificacion> findByUsuarioIdOrderByFechaCreacionDesc(String usuarioId);
+
+    List<Notificacion> findBySectorAndLeidaFalse(String sector);
+
+    int countByUsuarioIdAndLeidaFalse(String usuarioId);
+
 }

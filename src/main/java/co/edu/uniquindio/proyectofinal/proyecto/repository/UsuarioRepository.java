@@ -30,4 +30,6 @@ public interface UsuarioRepository extends MongoRepository<Usuario, ObjectId> {
             String nombre, String ciudad, EstadoUsuario estado, Pageable pageable);
 
     boolean existsByEmail(String email);
+
+    List<Usuario> findBySectorAndEstado(String sector, EstadoUsuario estado);
 }
