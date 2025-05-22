@@ -109,14 +109,19 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:8080"));
+        // URLs permitidas (añade las de Firebase y Render si es necesario)
+        config.setAllowedOrigins(List.of(
+                "http://localhost:4200", // Desarrollo local
+                "https://app-frontend-proyecto-uq-2d6af.web.app", // Firebase
+                "https://app-frontend-proyecto-uq-2d6af.firebaseapp.com" // Alternativa Firebase
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*")); // Para evitar problemas con headers personalizados
+        config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of(
-                "Content-Disposition", // ¡Clave para descargas!
+                "Content-Disposition",
                 "Content-Type",
                 "Authorization"));
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(true); // Necesario si usas cookies/tokens con credenciales
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
