@@ -28,10 +28,11 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (!usuarioRepository.existsByEmail("milton@mail.com")) {
             Usuario usuario = new Usuario(
-                    "Milton",
-                    "milton@mail.com",
+                    "Milton Gómez",
+                    "milton@gmail.com",
                     "3206991690",
-                    "Armenia", Rol.ADMINISTRADOR, EstadoUsuario.ACTIVO, passwordEncoder.encode("123456"), null, null);
+                    "Armenia", Rol.ADMINISTRADOR, EstadoUsuario.ACTIVO, passwordEncoder.encode("123456789"), null,
+                    null);
             usuarioRepository.save(usuario);
             System.out.println("Usuario creado EN ATLAS");
             System.out.println("✅ Usuario de prueba insertado correctamente.");
